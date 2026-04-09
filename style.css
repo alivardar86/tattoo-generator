@@ -1,0 +1,260 @@
+:root {
+  --bg: #0a0a0a;
+  --bg-elev: #141414;
+  --text: #e5e5e5;
+  --muted: #8a8a8a;
+  --border: #2a2a2a;
+  --accent: #e5e5e5;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* Screens */
+.screen {
+  display: none;
+  width: 100%;
+  max-width: 520px;
+  animation: fadeIn 0.5s ease;
+}
+
+.screen.active {
+  display: block;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.content.center {
+  text-align: center;
+  align-items: center;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Typography */
+.logo {
+  font-size: 2.5rem;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+}
+
+.tagline {
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.label {
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+/* Progress */
+.progress {
+  font-size: 0.8rem;
+  color: var(--muted);
+  letter-spacing: 0.2em;
+}
+
+.question {
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+/* Options */
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 16px 20px;
+  text-align: left;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 300;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 2px;
+}
+
+.option:hover {
+  border-color: var(--text);
+  background: var(--bg-elev);
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 14px 28px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  border: 1px solid var(--text);
+  border-radius: 2px;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.btn.primary {
+  background: var(--text);
+  color: #0a0a0a;
+}
+
+.btn.primary:hover {
+  background: transparent;
+  color: var(--text);
+}
+
+.btn.ghost {
+  background: transparent;
+  color: var(--text);
+}
+
+.btn.ghost:hover {
+  background: var(--text);
+  color: #0a0a0a;
+}
+
+/* Result */
+.prompt-box {
+  border-left: 2px solid var(--text);
+  padding: 16px 20px;
+  font-size: 1.1rem;
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.6;
+  background: var(--bg-elev);
+}
+
+/* Form */
+#lead-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+#lead-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#lead-form span {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+#lead-form input,
+#lead-form textarea {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 0;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 300;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+#lead-form input:focus,
+#lead-form textarea:focus {
+  border-bottom-color: var(--text);
+}
+
+#lead-form input::placeholder,
+#lead-form textarea::placeholder {
+  color: var(--muted);
+}
+
+#lead-form input:-webkit-autofill,
+#lead-form input:-webkit-autofill:hover,
+#lead-form input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text);
+  -webkit-box-shadow: 0 0 0 1000px var(--bg) inset;
+  caret-color: var(--text);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+#lead-form textarea {
+  resize: vertical;
+}
+
+/* Loader */
+.loader {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-top-color: var(--text);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: var(--muted);
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+}
+
+/* Responsive */
+@media (min-width: 640px) {
+  .logo { font-size: 3rem; }
+  h2 { font-size: 1.8rem; }
+  .question { font-size: 1.8rem; }
+}

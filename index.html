@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Can Levi — Tattoo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Hidden form for Netlify build-time detection -->
+  <form name="tattoo-request" data-netlify="true" hidden>
+    <input type="text" name="name" />
+    <input type="email" name="email" />
+    <textarea name="note"></textarea>
+    <input type="text" name="prompt" />
+  </form>
+
+  <main id="app">
+
+    <!-- 1. LANDING -->
+    <section class="screen active" id="screen-landing">
+      <div class="content">
+        <h1 class="logo">CAN LEVI</h1>
+        <p class="tagline">Senin hikâyenden bir çizgi.</p>
+        <button class="btn primary" data-action="start">Başla</button>
+      </div>
+    </section>
+
+    <!-- 2. QUESTIONS -->
+    <section class="screen" id="screen-questions">
+      <div class="content">
+        <div class="progress" id="progress">01/05</div>
+        <h2 class="question" id="question-text"></h2>
+        <div class="options" id="options"></div>
+      </div>
+    </section>
+
+    <!-- 3. LOADING -->
+    <section class="screen" id="screen-loading">
+      <div class="content center">
+        <div class="loader"></div>
+        <p class="loading-text">Senin çizgini buluyorum...</p>
+      </div>
+    </section>
+
+    <!-- 4. RESULT -->
+    <section class="screen" id="screen-result">
+      <div class="content">
+        <p class="label">Senin çizgin</p>
+        <blockquote class="prompt-box" id="prompt-output"></blockquote>
+        <button class="btn primary" data-action="to-form">Bu benimle, devam et</button>
+      </div>
+    </section>
+
+    <!-- 5. FORM -->
+    <section class="screen" id="screen-form">
+      <div class="content">
+        <h2>Son adım</h2>
+        <p class="muted">Bilgilerini bırak, sana dönerim.</p>
+        <form
+          id="lead-form"
+          name="tattoo-request"
+          method="POST"
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+        >
+          <input type="hidden" name="form-name" value="tattoo-request" />
+          <p hidden><label>Don't fill: <input name="bot-field" /></label></p>
+          <input type="hidden" name="prompt" id="hidden-prompt" />
+
+          <label>
+            <span>İsim</span>
+            <input type="text" name="name" required />
+          </label>
+          <label>
+            <span>Email</span>
+            <input type="email" name="email" required />
+          </label>
+          <label>
+            <span>Ek not (opsiyonel)</span>
+            <textarea name="note" rows="4"></textarea>
+          </label>
+
+          <button class="btn primary" type="submit">Gönder</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 6. CONFIRMATION -->
+    <section class="screen" id="screen-done">
+      <div class="content center">
+        <h2>Aldım, görüşürüz.</h2>
+        <p class="muted">Sana en kısa sürede dönüş yapacağım.</p>
+        <a class="btn ghost" href="https://www.instagram.com/can_levi/" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
