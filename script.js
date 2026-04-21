@@ -36,44 +36,243 @@ const questions = [
   }
 ];
 
-const promptTemplates = {
+// --- KEY NORMALIZATION ---
+const keyMap = {
   soru1: {
-    "Bir kişiyi": "Sevilen birinin izini taşıyan",
-    "Bir dönemi": "Bir dönemin kapanışını simgeleyen",
-    "Bir kararı": "Bir kararın gücünü yansıtan",
-    "Hiçbir şeyi — sadece güzel olsun": "Saf estetik, anlam yükü olmayan"
-  },
-  soru2: {
-    "Kol": "kol iç veya dış yüzeyine uygun",
-    "Bacak": "bacak hattını takip eden",
-    "Sırt / Göğüs": "geniş alanda nefes alan",
-    "Henüz bilmiyorum": "yerleşim esnek bırakılan"
+    "Bir kişiyi": "kisiyi",
+    "Bir dönemi": "donemi",
+    "Bir kararı": "karari",
+    "Hiçbir şeyi — sadece güzel olsun": "estetik"
   },
   soru3: {
-    "Küçük, fark edilmesin": "minimal, 3-5cm arası",
-    "Orta, dengeli": "orta boyut, dengeli",
-    "Büyük, statement": "statement parça, geniş alan kaplayan"
+    "Küçük, fark edilmesin": "kucuk",
+    "Orta, dengeli": "orta",
+    "Büyük, statement": "buyuk"
   },
   soru4: {
-    "Keskin ve güçlü": "keskin hatlar, güçlü kontrastlar",
-    "Yumuşak ve akışkan": "yumuşak geçişler, akışkan formlar",
-    "Kaotik ve serbest": "kaotik, serbest çizgiler",
-    "Minimal ve sessiz": "minimal, neredeyse fısıltı gibi"
-  },
-  soru5: {
-    "Hatırlama": "Bir anıyı saklayan.",
-    "Cesaret": "Cesareti hatırlatan.",
-    "Huzur": "Huzur veren.",
-    "Sadece estetik": "Sadece güzel olan."
+    "Keskin ve güçlü": "keskin",
+    "Yumuşak ve akışkan": "yumusak",
+    "Kaotik ve serbest": "kaotik",
+    "Minimal ve sessiz": "minimal"
   }
 };
 
+function makeKey(s1, s3, s4) {
+  return `${keyMap.soru1[s1]}_${keyMap.soru3[s3]}_${keyMap.soru4[s4]}`;
+}
+
+// --- 20 HANDCRAFTED COMBINATIONS ---
+// Key format: soru1_soru3_soru4
+const combinations = {
+  "kisiyi_kucuk_minimal": {
+    tema: "Anı",
+    form: "Tek çizgi, kesintisiz, neredeyse soyut",
+    boyut: "2–4cm",
+    yerlesim: "Bilek içi veya parmak yanı",
+    his: "Sessiz sadakat",
+    siir: "Birinin varlığını fısıldar gibi taşıyacak.\nGörünmez ama her zaman orada."
+  },
+  "kisiyi_kucuk_keskin": {
+    tema: "Özlem",
+    form: "İnce, keskin hatlar — bir tarih ya da koordinat gibi",
+    boyut: "2–4cm",
+    yerlesim: "Boyun altı veya kaburga",
+    his: "Derin, keskin",
+    siir: "Uzaklık ölçülmez.\nAma bu iz her zaman yakın."
+  },
+  "kisiyi_orta_yumusak": {
+    tema: "Bağlılık",
+    form: "Akışkan, organik bir form — belki bir siluet",
+    boyut: "6–8cm",
+    yerlesim: "Ön kol veya köprücük kemiği",
+    his: "Sıcak, sakin",
+    siir: "Sevgi her zaman söze ihtiyaç duymaz.\nBazen sadece ciltte bir şekil yeterlidir."
+  },
+  "kisiyi_buyuk_yumusak": {
+    tema: "Sevgi",
+    form: "Geniş, sarmalayan formlar — yumuşak geçişler",
+    boyut: "12–15cm",
+    yerlesim: "Sırt veya göğüs",
+    his: "Derin, kucaklayıcı",
+    siir: "Bazı insanlar iz bırakmaz.\nSen iz bırakmalarına izin verdin. Bu güzel."
+  },
+  "kisiyi_buyuk_kaotik": {
+    tema: "Kayıp",
+    form: "Dağınık, parçalı çizgiler — tamamlanmamış formlar",
+    boyut: "15cm+",
+    yerlesim: "Sırt veya uyluk",
+    his: "Ağır, dürüst",
+    siir: "Kayıp düzgün durmaz.\nBu çizgiler de durmuyor. İkisi de gerçek."
+  },
+  "donemi_kucuk_minimal": {
+    tema: "Geçiş",
+    form: "Soyut bir nokta, virgül ya da yatay çizgi",
+    boyut: "1–3cm",
+    yerlesim: "Bilek veya parmak",
+    his: "Hafif, nefes gibi",
+    siir: "O dönem kapandı.\nBu küçük iz, kapıyı kapatan elin izi."
+  },
+  "donemi_orta_keskin": {
+    tema: "Kapanış",
+    form: "Geometrik, köşeli hatlar — belki kırık bir şekil",
+    boyut: "6–10cm",
+    yerlesim: "Ön kol veya baldır",
+    his: "Kararlı, net",
+    siir: "O dönem bitti.\nBu iz, geride kalanın değil, ileriye bakışın sembolü."
+  },
+  "donemi_orta_yumusak": {
+    tema: "Dönüşüm",
+    form: "Organik, akışkan çizgiler — bir şeyin başka bir şeye evrimi",
+    boyut: "6–9cm",
+    yerlesim: "Kol veya köprücük kemiği",
+    his: "Huzurlu ama güçlü",
+    siir: "Geçmişi değil, ondan öğrendiklerini taşıyacak bir iz.\nKüçük ama unutulmaz."
+  },
+  "donemi_buyuk_kaotik": {
+    tema: "Kırılma",
+    form: "Serbest fırça darbeleri, düzensiz geometri",
+    boyut: "15cm+",
+    yerlesim: "Sırt veya uyluk",
+    his: "Ham, dürüst",
+    siir: "Bazı dönemler nazikçe bitmez.\nBu dövme o gerçeği gizlemiyor."
+  },
+  "donemi_buyuk_keskin": {
+    tema: "Son",
+    form: "Keskin, net geometri — bir kapı ya da çerçeve",
+    boyut: "12–18cm",
+    yerlesim: "Sırt ortası veya göğüs",
+    his: "Ağır, kalıcı",
+    siir: "Her son bir başlangıca zemin hazırlar.\nBu iz o zemini işaret ediyor."
+  },
+  "karari_kucuk_minimal": {
+    tema: "Odak",
+    form: "Tek bir sembol, geometrik ve yalın",
+    boyut: "2–3cm",
+    yerlesim: "Bilek içi veya parmak",
+    his: "Sessiz, güçlü",
+    siir: "Büyük kararlar küçük anlarda alınır.\nBu iz o anı tutuyor."
+  },
+  "karari_orta_keskin": {
+    tema: "Kararlılık",
+    form: "Keskin, belirgin hatlar — hiçbir belirsizlik yok",
+    boyut: "6–10cm",
+    yerlesim: "Ön kol veya baldır",
+    his: "Net, güçlü",
+    siir: "Bu karar kolay olmadı.\nAma doğruydu. Her baktığında hatırlayacaksın."
+  },
+  "karari_orta_yumusak": {
+    tema: "Denge",
+    form: "Akışkan ama yapılandırılmış — yin-yang enerjisi",
+    boyut: "6–8cm",
+    yerlesim: "Kol veya göğüs",
+    his: "Huzurlu, kararlı",
+    siir: "Zor kararlar bazen en yumuşak yerlere yerleşir.\nOrası senin kararın için doğru yer."
+  },
+  "karari_buyuk_keskin": {
+    tema: "İrade",
+    form: "Güçlü, simetrik geometri — bir ok ya da yapı",
+    boyut: "12–18cm",
+    yerlesim: "Sırt veya göğüs",
+    his: "Baskın, kalıcı",
+    siir: "Herkes karar verir.\nAz kişi kararının üstünde durur. Sen duruyorsun."
+  },
+  "karari_buyuk_kaotik": {
+    tema: "İsyan",
+    form: "Dağınık, agresif çizgiler — kural tanımayan bir enerji",
+    boyut: "15cm+",
+    yerlesim: "Sırt, göğüs veya uyluk",
+    his: "Yoğun, özgür",
+    siir: "Bu karar sistemin onayladığı türden değildi.\nVe bu onu daha gerçek yapıyor."
+  },
+  "estetik_kucuk_minimal": {
+    tema: "Sadelik",
+    form: "Tek bir çizgi, yalın ve mükemmel",
+    boyut: "1–3cm",
+    yerlesim: "Parmak, bilek ya da kulak arkası",
+    his: "Dingin, zarif",
+    siir: "Anlam aramıyorsun.\nSadece güzel bir şey istiyorsun. Bu da bir cesaret."
+  },
+  "estetik_orta_keskin": {
+    tema: "Güç",
+    form: "Keskin, net formlar — saf estetik enerji",
+    boyut: "6–10cm",
+    yerlesim: "Kol veya bacak",
+    his: "Etkileyici, özgüvenli",
+    siir: "Güzellik kendi başına bir mesaj taşır.\nVe bu mesaj yeterince güçlü."
+  },
+  "estetik_orta_yumusak": {
+    tema: "Ritim",
+    form: "Yumuşak, tekrarlayan formlar — neredeyse müzikal",
+    boyut: "7–10cm",
+    yerlesim: "Kol, omuz veya böğür",
+    his: "Akışkan, estetik",
+    siir: "Güzellik bazen bir ritimdir.\nSen o ritmi taşımak istiyorsun."
+  },
+  "estetik_buyuk_yumusak": {
+    tema: "Akış",
+    form: "Geniş, serbest akışkan formlar — soyut ve zarif",
+    boyut: "15cm+",
+    yerlesim: "Sırt veya uyluk",
+    his: "Özgür, etkileyici",
+    siir: "Bu dövme bir şey söylemek zorunda değil.\nSadece var olması yeterli."
+  },
+  "estetik_buyuk_kaotik": {
+    tema: "Özgürlük",
+    form: "Serbest fırça darbeleri, kontrolsüz enerji",
+    boyut: "15cm+",
+    yerlesim: "Sırt, göğüs veya uyluk",
+    his: "Taşkın, enerjik",
+    siir: "Anlam aramıyorsun.\nSadece var olmak istiyorsun. Bu da bir anlam aslında."
+  }
+};
+
+// --- FALLBACK TEMPLATES (kalan 28 kombinasyon için) ---
+const fallback = {
+  tema: {
+    "Bir kişiyi": "Bağ",
+    "Bir dönemi": "Dönüşüm",
+    "Bir kararı": "İrade",
+    "Hiçbir şeyi — sadece güzel olsun": "Form"
+  },
+  form: {
+    "Keskin ve güçlü": "Keskin hatlar, güçlü kontrastlar",
+    "Yumuşak ve akışkan": "Yumuşak geçişler, akışkan formlar",
+    "Kaotik ve serbest": "Serbest çizgiler, kontrolsüz enerji",
+    "Minimal ve sessiz": "Minimal, neredeyse fısıltı gibi"
+  },
+  boyut: {
+    "Küçük, fark edilmesin": "2–4cm, gizli bir işaret",
+    "Orta, dengeli": "6–10cm, dengeli bir alan",
+    "Büyük, statement": "15cm+, geniş bir ifade"
+  },
+  yerlesim: {
+    "Kol": "Kol iç yüzeyi veya ön kol",
+    "Bacak": "Baldır veya bacak hattı",
+    "Sırt / Göğüs": "Sırt ortası veya göğüs",
+    "Henüz bilmiyorum": "Esnek — birlikte karar veririz"
+  },
+  his: {
+    "Hatırlama": "Sakin, içe dönük",
+    "Cesaret": "Güçlü, kararlı",
+    "Huzur": "Yumuşak, dengeleyici",
+    "Sadece estetik": "Özgür, sınırsız"
+  },
+  siir: {
+    "Bir kişiyi": "Bazı izler görünmez ama her zaman hissedilir.\nBu da böyle olacak.",
+    "Bir dönemi": "Her dönem bir şey öğretir.\nBu dövme o öğretinin kalıcı izi.",
+    "Bir kararı": "Kararlar bazen sessiz, bazen gürültülü gelir.\nBu, seninki.",
+    "Hiçbir şeyi — sadece güzel olsun": "Bazen güzellik kendi başına yeterlidir.\nVe bu yeterlilik bir güçtür."
+  }
+};
+
+// --- STATE ---
 const state = {
   currentQuestion: 0,
   answers: {},
-  prompt: ""
+  result: null
 };
 
+// --- SCREENS ---
 const screens = {
   landing: document.getElementById("screen-landing"),
   questions: document.getElementById("screen-questions"),
@@ -92,6 +291,7 @@ function pad(n) {
   return n.toString().padStart(2, "0");
 }
 
+// --- QUESTIONS ---
 function renderQuestion() {
   const q = questions[state.currentQuestion];
   document.getElementById("progress").textContent =
@@ -117,35 +317,66 @@ function selectOption(value) {
   if (state.currentQuestion < questions.length) {
     renderQuestion();
   } else {
-    buildPrompt();
+    buildResult();
     showScreen("loading");
     setTimeout(() => {
-      document.getElementById("prompt-output").textContent = state.prompt;
+      renderResult();
       showScreen("result");
     }, 2500);
   }
 }
 
-function buildPrompt() {
+// --- BUILD RESULT ---
+function buildResult() {
   const a = state.answers;
-  const p1 = promptTemplates.soru1[a.soru1];
-  const p2 = promptTemplates.soru2[a.soru2];
-  const p3 = promptTemplates.soru3[a.soru3];
-  const p4 = promptTemplates.soru4[a.soru4];
-  const p5 = promptTemplates.soru5[a.soru5];
-  state.prompt = `${p1}. ${p2}, ${p3}. ${p4}. ${p5}`;
+  const key = makeKey(a.soru1, a.soru3, a.soru4);
+
+  if (combinations[key]) {
+    state.result = combinations[key];
+  } else {
+    // Fallback: compose from individual answers
+    state.result = {
+      tema: fallback.tema[a.soru1],
+      form: fallback.form[a.soru4],
+      boyut: fallback.boyut[a.soru3],
+      yerlesim: fallback.yerlesim[a.soru2],
+      his: fallback.his[a.soru5],
+      siir: fallback.siir[a.soru1]
+    };
+  }
 }
 
-// Event listeners
+// --- RENDER RESULT CARD ---
+function renderResult() {
+  const r = state.result;
+  document.getElementById("r-tema").textContent = r.tema;
+  document.getElementById("r-form").textContent = r.form;
+  document.getElementById("r-boyut").textContent = r.boyut;
+  document.getElementById("r-yerlesim").textContent = r.yerlesim;
+  document.getElementById("r-his").textContent = r.his;
+  document.getElementById("r-siir").textContent = `"${r.siir}"`;
+}
+
+// --- EVENT LISTENERS ---
 document.querySelector('[data-action="start"]').addEventListener("click", () => {
   state.currentQuestion = 0;
   state.answers = {};
+  state.result = null;
   renderQuestion();
   showScreen("questions");
 });
 
 document.querySelector('[data-action="to-form"]').addEventListener("click", () => {
-  document.getElementById("hidden-prompt").value = state.prompt;
+  const r = state.result;
+  const promptText = [
+    `TEMA: ${r.tema}`,
+    `FORM: ${r.form}`,
+    `BOYUT: ${r.boyut}`,
+    `YERLEŞİM: ${r.yerlesim}`,
+    `HİS: ${r.his}`,
+    r.siir
+  ].join("\n");
+  document.getElementById("hidden-prompt").value = promptText;
   showScreen("form");
 });
 
