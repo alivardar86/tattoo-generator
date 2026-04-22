@@ -14,10 +14,10 @@ const questions = [
     type: "visual",
     text: "Hangisi sana daha çok hitap ediyor?",
     options: [
-      { value: "fine-line",    label: "İnce",     img: "images/fine-line.jpg",    alt: "Fine Line" },
-      { value: "blackwork",    label: "Dolgun",   img: "images/blackwork.jpg",    alt: "Blackwork" },
-      { value: "illustrative", label: "Çizimsel", img: "images/illustrative.jpg", alt: "Illustrative" },
-      { value: "geometric",    label: "Şekilsel", img: "images/geometric.jpg",    alt: "Geometric" }
+      { value: "fine-line",    label: "İnce",     img: "images/fineline.png",    alt: "Fine Line" },
+      { value: "blackwork",    label: "Dolgun",   img: "images/blackwork.png",    alt: "Blackwork" },
+      { value: "illustrative", label: "Çizimsel", img: "images/illustrative.png", alt: "Illustrative" },
+      { value: "geometric",    label: "Şekilsel", img: "images/geometric.png",    alt: "Geometric" }
     ]
   },
   {
