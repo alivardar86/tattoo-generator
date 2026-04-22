@@ -47,8 +47,8 @@
       </div>
     </section>
 
-    <!-- 4. RESULT -->
-    <section class="screen" id="screen-result">
+    <!-- 4. QUIZ RESULT -->
+    <section class="screen" id="screen-quiz-result">
       <div class="content">
         <p class="label">Senin çizgin</p>
         <div class="result-card">
@@ -74,12 +74,12 @@
           </div>
           <div class="result-poem" id="r-siir"></div>
         </div>
-        <button class="btn primary" data-action="to-form">Bu benimle, devam et</button>
+        <button class="btn primary" data-action="quiz-to-form">Bu benimle, devam et</button>
         <button class="btn ghost" data-action="to-wheel">Çarkı çevir</button>
       </div>
     </section>
 
-    <!-- WHEEL -->
+    <!-- 5. WHEEL -->
     <section class="screen" id="screen-wheel">
       <div class="content center">
         <p class="label">Şansına bırak</p>
@@ -88,40 +88,42 @@
           <canvas id="wheel-canvas" width="300" height="300"></canvas>
         </div>
         <button class="btn primary" id="spin-btn">Çarkı Çevir</button>
-
-        <div id="wheel-result" hidden>
-          <div class="result-card">
-            <div class="result-row">
-              <span class="result-label">TEMA</span>
-              <span class="result-value" id="wr-tema"></span>
-            </div>
-            <div class="result-row">
-              <span class="result-label">FORM</span>
-              <span class="result-value" id="wr-form"></span>
-            </div>
-            <div class="result-row">
-              <span class="result-label">BOYUT</span>
-              <span class="result-value" id="wr-boyut"></span>
-            </div>
-            <div class="result-row">
-              <span class="result-label">YERLEŞİM</span>
-              <span class="result-value" id="wr-yerlesim"></span>
-            </div>
-            <div class="result-row">
-              <span class="result-label">HİS</span>
-              <span class="result-value" id="wr-his"></span>
-            </div>
-            <div class="result-poem" id="wr-siir"></div>
-          </div>
-          <div class="wheel-actions">
-            <button class="btn primary" data-action="wheel-to-form">Bu benimle, devam et</button>
-            <button class="btn ghost" id="respin-btn">Tekrar çevir</button>
-          </div>
-        </div>
       </div>
     </section>
 
-    <!-- 5. FORM -->
+    <!-- 6. WHEEL RESULT -->
+    <section class="screen" id="screen-wheel-result">
+      <div class="content">
+        <p class="label">Çarkın seçimi</p>
+        <div class="result-card">
+          <div class="result-row">
+            <span class="result-label">TEMA</span>
+            <span class="result-value" id="wr-tema"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">FORM</span>
+            <span class="result-value" id="wr-form"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">BOYUT</span>
+            <span class="result-value" id="wr-boyut"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">YERLEŞİM</span>
+            <span class="result-value" id="wr-yerlesim"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">HİS</span>
+            <span class="result-value" id="wr-his"></span>
+          </div>
+          <div class="result-poem" id="wr-siir"></div>
+        </div>
+        <button class="btn primary" data-action="wheel-to-form">Bu benimle, devam et</button>
+        <button class="btn ghost" data-action="respin">Tekrar çevir</button>
+      </div>
+    </section>
+
+    <!-- 7. FORM -->
     <section class="screen" id="screen-form">
       <div class="content">
         <h2>Son adım</h2>
@@ -155,7 +157,7 @@
       </div>
     </section>
 
-    <!-- 6. CONFIRMATION -->
+    <!-- 8. CONFIRMATION -->
     <section class="screen" id="screen-done">
       <div class="content center">
         <h2>Aldım, görüşürüz.</h2>

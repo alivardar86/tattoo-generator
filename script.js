@@ -354,13 +354,14 @@ const state = {
 
 // --- SCREENS ---
 const screens = {
-  landing:   document.getElementById("screen-landing"),
-  questions: document.getElementById("screen-questions"),
-  loading:   document.getElementById("screen-loading"),
-  result:    document.getElementById("screen-result"),
-  wheel:     document.getElementById("screen-wheel"),
-  form:      document.getElementById("screen-form"),
-  done:      document.getElementById("screen-done")
+  landing:     document.getElementById("screen-landing"),
+  questions:   document.getElementById("screen-questions"),
+  loading:     document.getElementById("screen-loading"),
+  quizResult:  document.getElementById("screen-quiz-result"),
+  wheel:       document.getElementById("screen-wheel"),
+  wheelResult: document.getElementById("screen-wheel-result"),
+  form:        document.getElementById("screen-form"),
+  done:        document.getElementById("screen-done")
 };
 
 function showScreen(name) {
@@ -402,7 +403,7 @@ function selectOption(value) {
     showScreen("loading");
     setTimeout(() => {
       renderResult();
-      showScreen("result");
+      showScreen("quizResult");
     }, 2500);
   }
 }
@@ -503,9 +504,6 @@ function spinWheel() {
   wheelSpinning = true;
 
   const spinBtn = document.getElementById("spin-btn");
-  const wheelResultEl = document.getElementById("wheel-result");
-
-  wheelResultEl.hidden = true;
   spinBtn.disabled = true;
 
   const n = wheelItems.length;
@@ -554,14 +552,26 @@ function showWheelResult(index) {
   document.getElementById("wr-his").textContent = item.his;
   document.getElementById("wr-siir").textContent = `"${item.siir}"`;
   state.wheelResult = item;
-  document.getElementById("wheel-result").hidden = false;
+  showScreen("wheelResult");
+}
+
+// --- HELPERS ---
+function resultToPrompt(r) {
+  return [
+    `TEMA: ${r.tema}`,
+    `FORM: ${r.form}`,
+    `BOYUT: ${r.boyut}`,
+    `YERLEŞİM: ${r.yerlesim}`,
+    `HİS: ${r.his}`,
+    r.siir
+  ].join("\n");
 }
 
 // --- EVENT LISTENERS ---
 document.querySelector('[data-action="start"]').addEventListener("click", () => {
   state.currentQuestion = 0;
   state.answers = {};
-  state.result = null;
+  state.quizResult = null;
   renderQuestion();
   showScreen("questions");
 });
@@ -572,33 +582,20 @@ document.querySelector('[data-action="to-wheel"]').addEventListener("click", () 
 });
 
 document.getElementById("spin-btn").addEventListener("click", spinWheel);
-document.getElementById("respin-btn").addEventListener("click", spinWheel);
 
-document.querySelector('[data-action="wheel-to-form"]').addEventListener("click", () => {
-  const r = state.wheelResult;
-  const promptText = [
-    `TEMA: ${r.tema}`,
-    `FORM: ${r.form}`,
-    `BOYUT: ${r.boyut}`,
-    `YERLEŞİM: ${r.yerlesim}`,
-    `HİS: ${r.his}`,
-    r.siir
-  ].join("\n");
-  document.getElementById("hidden-prompt").value = promptText;
+document.querySelector('[data-action="respin"]').addEventListener("click", () => {
+  showScreen("wheel");
+  drawWheel(wheelAngle, -1);
+  spinWheel();
+});
+
+document.querySelector('[data-action="quiz-to-form"]').addEventListener("click", () => {
+  document.getElementById("hidden-prompt").value = resultToPrompt(state.quizResult);
   showScreen("form");
 });
 
-document.querySelector('[data-action="to-form"]').addEventListener("click", () => {
-  const r = state.quizResult;
-  const promptText = [
-    `TEMA: ${r.tema}`,
-    `FORM: ${r.form}`,
-    `BOYUT: ${r.boyut}`,
-    `YERLEŞİM: ${r.yerlesim}`,
-    `HİS: ${r.his}`,
-    r.siir
-  ].join("\n");
-  document.getElementById("hidden-prompt").value = promptText;
+document.querySelector('[data-action="wheel-to-form"]').addEventListener("click", () => {
+  document.getElementById("hidden-prompt").value = resultToPrompt(state.wheelResult);
   showScreen("form");
 });
 
