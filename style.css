@@ -264,6 +264,50 @@ h2 {
   resize: vertical;
 }
 
+/* Visual Question Cards */
+.visual-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+.visual-card {
+  cursor: pointer;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+  background: var(--bg-elev);
+}
+
+.visual-card:hover {
+  border-color: #666;
+  transform: scale(1.02);
+}
+
+.visual-card.selected {
+  border-color: var(--text);
+}
+
+.visual-card img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+  background: var(--bg-elev);
+}
+
+.visual-card span {
+  display: block;
+  text-align: center;
+  padding: 10px 8px;
+  font-size: 0.85rem;
+  font-weight: 300;
+  color: var(--text);
+  letter-spacing: 0.03em;
+}
+
 /* Wheel */
 .wheel-container {
   position: relative;

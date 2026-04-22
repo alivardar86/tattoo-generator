@@ -10,6 +10,17 @@ const questions = [
     ]
   },
   {
+    key: "soru_style",
+    type: "visual",
+    text: "Hangisi sana daha çok hitap ediyor?",
+    options: [
+      { value: "fine-line",    label: "İnce",     img: "images/fine-line.jpg",    alt: "Fine Line" },
+      { value: "blackwork",    label: "Dolgun",   img: "images/blackwork.jpg",    alt: "Blackwork" },
+      { value: "illustrative", label: "Çizimsel", img: "images/illustrative.jpg", alt: "Illustrative" },
+      { value: "geometric",    label: "Şekilsel", img: "images/geometric.jpg",    alt: "Geometric" }
+    ]
+  },
+  {
     key: "soru2",
     text: "Vücudunda nereyi düşünüyorsun?",
     options: ["Kol", "Bacak", "Sırt / Göğüs", "Henüz bilmiyorum"]
@@ -35,6 +46,14 @@ const questions = [
     options: ["Hatırlama", "Cesaret", "Huzur", "Sadece estetik"]
   }
 ];
+
+// --- STYLE MAPPING (görsel soru) ---
+const styleMapping = {
+  "fine-line":    "ince çizgiler, detaylı ve zarif",
+  "blackwork":    "dolgun siyah alanlar, güçlü kontrastlar",
+  "illustrative": "çizimsel, hikaye anlatan",
+  "geometric":    "geometrik formlar, keskin açılar"
+};
 
 // --- KEY NORMALIZATION ---
 const keyMap = {
@@ -382,13 +401,33 @@ function renderQuestion() {
 
   const optionsEl = document.getElementById("options");
   optionsEl.innerHTML = "";
-  q.options.forEach((opt) => {
-    const btn = document.createElement("button");
-    btn.className = "option";
-    btn.textContent = opt;
-    btn.addEventListener("click", () => selectOption(opt));
-    optionsEl.appendChild(btn);
-  });
+
+  if (q.type === "visual") {
+    const grid = document.createElement("div");
+    grid.className = "visual-options";
+    q.options.forEach((opt) => {
+      const card = document.createElement("div");
+      card.className = "visual-card";
+      card.dataset.value = opt.value;
+      card.innerHTML = `<img src="${opt.img}" alt="${opt.alt}" loading="lazy"><span>${opt.label}</span>`;
+      card.addEventListener("click", () => {
+        // Highlight seçili kart, kısa gecikmeyle sonraki soruya geç
+        document.querySelectorAll(".visual-card").forEach(c => c.classList.remove("selected"));
+        card.classList.add("selected");
+        setTimeout(() => selectOption(opt.value), 300);
+      });
+      grid.appendChild(card);
+    });
+    optionsEl.appendChild(grid);
+  } else {
+    q.options.forEach((opt) => {
+      const btn = document.createElement("button");
+      btn.className = "option";
+      btn.textContent = opt;
+      btn.addEventListener("click", () => selectOption(opt));
+      optionsEl.appendChild(btn);
+    });
+  }
 }
 
 function selectOption(value) {
@@ -414,18 +453,21 @@ function buildResult() {
   const key = makeKey(a.soru1, a.soru3, a.soru4);
 
   if (combinations[key]) {
-    state.quizResult = combinations[key];
+    state.quizResult = { ...combinations[key] };
   } else {
     // Fallback: compose from individual answers
     state.quizResult = {
-      tema: fallback.tema[a.soru1],
-      form: fallback.form[a.soru4],
-      boyut: fallback.boyut[a.soru3],
+      tema:     fallback.tema[a.soru1],
+      form:     fallback.form[a.soru4],
+      boyut:    fallback.boyut[a.soru3],
       yerlesim: fallback.yerlesim[a.soru2],
-      his: fallback.his[a.soru5],
-      siir: fallback.siir[a.soru1]
+      his:      fallback.his[a.soru5],
+      siir:     fallback.siir[a.soru1]
     };
   }
+
+  // Görsel sorudan gelen stil bilgisini ekle
+  state.quizResult.stil = styleMapping[a.soru_style] || null;
 }
 
 // --- RENDER RESULT CARD ---
@@ -437,6 +479,15 @@ function renderResult() {
   document.getElementById("r-yerlesim").textContent = r.yerlesim;
   document.getElementById("r-his").textContent = r.his;
   document.getElementById("r-siir").textContent = `"${r.siir}"`;
+
+  // STİL satırı — sadece görsel soru cevaplanmışsa göster
+  const stilRow = document.getElementById("r-stil-row");
+  if (r.stil) {
+    document.getElementById("r-stil").textContent = r.stil;
+    stilRow.style.display = "";
+  } else {
+    stilRow.style.display = "none";
+  }
 }
 
 // --- WHEEL ---
@@ -560,11 +611,12 @@ function resultToPrompt(r) {
   return [
     `TEMA: ${r.tema}`,
     `FORM: ${r.form}`,
+    r.stil ? `STİL: ${r.stil}` : null,
     `BOYUT: ${r.boyut}`,
     `YERLEŞİM: ${r.yerlesim}`,
     `HİS: ${r.his}`,
     r.siir
-  ].join("\n");
+  ].filter(Boolean).join("\n");
 }
 
 // --- EVENT LISTENERS ---
