@@ -493,7 +493,15 @@
 
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
+/* ══════════════════════════════════════════════
+   SUPABASE CONFIG — kendi değerlerinle değiştir
+══════════════════════════════════════════════ */
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 /* ══════════════════════════════════════════════
    DATA — unchanged from original
 ══════════════════════════════════════════════ */
@@ -574,7 +582,7 @@ const segColors=["#16213e","#2d1b33","#1a2e1a","#3b1a1a","#1b2a2e","#2e2616","#1
 /* ══════════════════════════════════════════════
    STATE
 ══════════════════════════════════════════════ */
-const state = { currentQuestion:0, answers:{}, quizResult:null, wheelResult:null };
+const state = { currentQuestion:0, answers:{}, quizResult:null, wheelResult:null, source:'quiz' };
 
 /* ══════════════════════════════════════════════
    SCREENS
@@ -802,11 +810,13 @@ document.querySelector('[data-action="respin"]').addEventListener("click",()=>{
 });
 
 document.querySelector('[data-action="quiz-to-form"]').addEventListener("click",()=>{
+  state.source = 'quiz';
   document.getElementById("hidden-prompt").value = resultToPrompt(state.quizResult);
   showScreen("form");
 });
 
 document.querySelector('[data-action="wheel-to-form"]').addEventListener("click",()=>{
+  state.source = 'wheel';
   document.getElementById("hidden-prompt").value = resultToPrompt(state.wheelResult);
   showScreen("form");
 });
@@ -822,14 +832,26 @@ backBtn.addEventListener("click",()=>{
   }
 });
 
-document.getElementById("lead-form").addEventListener("submit",(e)=>{
+document.getElementById("lead-form").addEventListener("submit", async (e)=>{
   e.preventDefault();
-  const form=e.target, data=new FormData(form);
-  fetch("/",{
-    method:"POST",
-    headers:{"Content-Type":"application/x-www-form-urlencoded"},
-    body: new URLSearchParams(data).toString()
-  }).then(()=>showScreen("done")).catch(()=>showScreen("done"));
+  const form = e.target;
+  const btn  = form.querySelector('[type="submit"]');
+  btn.disabled = true;
+  btn.textContent = 'Gönderiliyor...';
+
+  const result = state.source === 'wheel' ? state.wheelResult : state.quizResult;
+
+  const { error } = await sb.from('submissions').insert([{
+    name:          form.querySelector('[name="name"]').value.trim(),
+    email:         form.querySelector('[name="email"]').value.trim(),
+    note:          form.querySelector('[name="note"]').value.trim() || null,
+    answers:       state.answers,
+    prompt_result: result,
+    source:        state.source
+  }]);
+
+  if (error) console.error('Supabase insert error:', error);
+  showScreen("done");
 });
 </script>
 </body>
