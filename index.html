@@ -3,175 +3,834 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Can Levi — Tattoo</title>
+  <title>CAN LEVI</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #070707;
+      --cream:      #ede8df;
+      --cream-dim:  rgba(237,232,223,0.45);
+      --cream-faint:rgba(237,232,223,0.14);
+      --gold:       #c9b89a;
+      --gold-dim:   rgba(201,184,154,0.30);
+      --serif:      'Cormorant Garamond', Georgia, serif;
+      --dur:        0.75s;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--cream);
+      font-family: var(--serif);
+      font-weight: 300;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* grain */
+    body::after {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+      opacity: .55;
+    }
+
+    /* ── Progress bar ── */
+    #progress-bar {
+      position: fixed; top: 0; left: 0; height: 1px;
+      background: var(--gold); z-index: 200;
+      transition: width .9s cubic-bezier(.16,1,.3,1);
+      width: 0%;
+    }
+
+    /* ── Step + Back ── */
+    #step-counter {
+      position: fixed; top: 28px; right: 32px;
+      font-size: 11px; letter-spacing: .2em; color: var(--cream-dim);
+      display: none; z-index: 100;
+    }
+    #back-btn {
+      position: fixed; top: 24px; left: 32px;
+      background: none; border: none; cursor: pointer;
+      color: var(--cream-dim); font-family: var(--serif);
+      font-size: 13px; letter-spacing: .12em;
+      padding: 6px 0; display: none; z-index: 100;
+      transition: color .3s;
+    }
+    #back-btn:hover { color: var(--cream); }
+
+    /* ── Screens ── */
+    #app {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 80px 24px 60px;
+    }
+
+    .screen {
+      display: none;
+      width: 100%; max-width: 560px;
+      flex-direction: column; align-items: center;
+      animation: fadeUp var(--dur) cubic-bezier(.16,1,.3,1) both;
+    }
+    .screen.active { display: flex; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Decorative elements ── */
+    .h-rule {
+      width: 1px; background: linear-gradient(to bottom, transparent, var(--gold-dim), transparent);
+    }
+    .v-rule {
+      width: 48px; height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold-dim), transparent);
+    }
+
+    /* ══════════════════════════════
+       LANDING
+    ══════════════════════════════ */
+    .landing-eyebrow {
+      font-size: 10px; letter-spacing: .38em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 28px;
+    }
+    .landing-name {
+      font-size: clamp(56px, 10vw, 112px);
+      font-weight: 300; letter-spacing: .24em; line-height: 1;
+      text-align: center; margin-bottom: 24px;
+    }
+    .v-rule-long {
+      width: 1px; height: 56px; margin: 0 auto 24px;
+      background: linear-gradient(to bottom, transparent, var(--gold-dim), transparent);
+    }
+    .landing-tagline {
+      font-size: clamp(15px,2.4vw,20px); font-style: italic;
+      color: var(--cream-dim); text-align: center;
+      line-height: 1.7; margin-bottom: 64px;
+    }
+    .enter-btn {
+      background: none; border: none; cursor: pointer;
+      font-family: var(--serif); font-size: 12px;
+      letter-spacing: .3em; text-transform: uppercase;
+      color: var(--cream); padding: 14px 0;
+      position: relative; transition: color .3s;
+    }
+    .enter-btn::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+      background: var(--gold); transform: scaleX(.25); transform-origin: left;
+      transition: transform .6s cubic-bezier(.16,1,.3,1);
+    }
+    .enter-btn:hover { color: var(--gold); }
+    .enter-btn:hover::after { transform: scaleX(1); }
+
+    /* ══════════════════════════════
+       QUESTIONS
+    ══════════════════════════════ */
+    .q-label {
+      font-size: 10px; letter-spacing: .35em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 18px;
+    }
+    .q-text {
+      font-size: clamp(26px,4.5vw,46px); font-weight: 300; font-style: italic;
+      text-align: center; line-height: 1.25; margin-bottom: 48px;
+    }
+
+    /* text options */
+    .options {
+      display: flex; flex-direction: column; gap: 8px; width: 100%;
+    }
+    .option {
+      background: none; border: 1px solid var(--cream-faint);
+      color: var(--cream-dim); font-family: var(--serif); font-size: 16px;
+      font-weight: 300; padding: 14px 24px; text-align: left; cursor: pointer;
+      transition: all .3s; border-radius: 0; letter-spacing: .04em;
+    }
+    .option:hover { border-color: var(--gold-dim); color: var(--cream); }
+    .option.selected { border-color: var(--gold); color: var(--cream); background: rgba(201,184,154,.06); }
+
+    /* visual options */
+    .visual-options {
+      display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; width: 100%;
+    }
+    .visual-card {
+      cursor: pointer; border: 1px solid var(--cream-faint);
+      overflow: hidden; transition: all .35s;
+      background: rgba(255,255,255,.02);
+    }
+    .visual-card:hover { border-color: var(--gold-dim); }
+    .visual-card.selected { border-color: var(--gold); background: rgba(201,184,154,.05); }
+    .visual-card img {
+      width: 100%; aspect-ratio: 1; object-fit: cover;
+      display: block; filter: grayscale(20%); transition: filter .35s;
+    }
+    .visual-card:hover img, .visual-card.selected img { filter: grayscale(0%); }
+    .visual-card span {
+      display: block; text-align: center; padding: 10px 8px;
+      font-size: 13px; font-weight: 300; color: var(--cream-dim);
+      letter-spacing: .1em; transition: color .3s;
+    }
+    .visual-card:hover span, .visual-card.selected span { color: var(--cream); }
+
+    /* ══════════════════════════════
+       LOADING
+    ══════════════════════════════ */
+    .loading-text {
+      font-size: clamp(22px,3.5vw,36px); font-style: italic;
+      font-weight: 300; color: var(--cream-dim); text-align: center;
+    }
+    .dots span {
+      animation: blink 1.5s ease-in-out infinite; opacity: 0;
+    }
+    .dots span:nth-child(2) { animation-delay: .2s; }
+    .dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
+
+    /* ══════════════════════════════
+       RESULT CARD
+    ══════════════════════════════ */
+    .oracle-eyebrow {
+      font-size: 10px; letter-spacing: .38em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 36px; text-align: center;
+    }
+    .result-card {
+      width: 100%; border: 1px solid var(--cream-faint);
+      margin-bottom: 40px;
+    }
+    .result-row {
+      display: flex; align-items: baseline; gap: 20px;
+      padding: 14px 24px; border-bottom: 1px solid var(--cream-faint);
+    }
+    .result-row:last-child { border-bottom: none; }
+    .result-label {
+      font-size: 9px; letter-spacing: .22em; color: var(--gold);
+      flex-shrink: 0; width: 76px; padding-top: 2px;
+    }
+    .result-value {
+      font-size: 15px; font-weight: 300; color: var(--cream);
+      line-height: 1.45;
+    }
+    .result-poem {
+      padding: 24px; font-style: italic; font-size: 16px;
+      color: var(--cream-dim); line-height: 1.8; white-space: pre-line;
+      border-top: 1px solid var(--cream-faint); text-align: center;
+    }
+
+    .oracle-note {
+      font-size: 14px; font-style: italic; color: var(--cream-dim);
+      text-align: center; line-height: 1.8; margin-bottom: 40px;
+      max-width: 380px;
+    }
+    .oracle-note strong { color: var(--cream); font-style: normal; font-weight: 400; }
+
+    /* ══════════════════════════════
+       BUTTONS (shared)
+    ══════════════════════════════ */
+    .btn-group {
+      display: flex; flex-direction: column; gap: 12px; width: 100%;
+    }
+    .btn {
+      font-family: var(--serif); font-size: 13px; letter-spacing: .22em;
+      text-transform: uppercase; padding: 15px 32px; cursor: pointer;
+      transition: all .35s; text-decoration: none; text-align: center;
+      border-radius: 0; font-weight: 300; display: block; width: 100%;
+    }
+    .btn.primary {
+      background: none; border: 1px solid var(--gold); color: var(--cream);
+    }
+    .btn.primary:hover { background: rgba(201,184,154,.1); }
+    .btn.ghost {
+      background: none; border: 1px solid var(--cream-faint); color: var(--cream-dim);
+    }
+    .btn.ghost:hover { border-color: var(--cream-dim); color: var(--cream); }
+
+    /* ══════════════════════════════
+       WHEEL
+    ══════════════════════════════ */
+    .wheel-eyebrow {
+      font-size: 10px; letter-spacing: .38em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 36px; text-align: center;
+    }
+    .wheel-wrap {
+      position: relative; width: 300px; margin: 0 auto 36px;
+    }
+    .wheel-pointer {
+      position: absolute; top: -14px; left: 50%;
+      transform: translateX(-50%);
+      color: var(--gold); font-size: 18px; z-index: 2;
+      filter: drop-shadow(0 0 6px rgba(201,184,154,.5));
+    }
+    #wheel-canvas {
+      display: block; border-radius: 50%;
+      border: 1px solid var(--cream-faint);
+    }
+
+    /* ══════════════════════════════
+       FORM
+    ══════════════════════════════ */
+    .form-title {
+      font-size: clamp(28px,4.5vw,46px); font-weight: 300; font-style: italic;
+      text-align: center; margin-bottom: 10px;
+    }
+    .form-sub {
+      font-size: 15px; font-style: italic; color: var(--cream-dim);
+      text-align: center; line-height: 1.7; margin-bottom: 52px;
+    }
+    #lead-form { display: flex; flex-direction: column; gap: 24px; width: 100%; }
+    #lead-form label { display: flex; flex-direction: column; gap: 8px; }
+    #lead-form span {
+      font-size: 9px; letter-spacing: .28em; text-transform: uppercase;
+      color: var(--gold);
+    }
+    #lead-form input, #lead-form textarea {
+      background: none; border: none;
+      border-bottom: 1px solid var(--cream-faint);
+      color: var(--cream); font-family: var(--serif); font-size: 17px;
+      font-weight: 300; padding: 10px 0; outline: none; border-radius: 0;
+      transition: border-color .3s;
+    }
+    #lead-form input:focus, #lead-form textarea:focus { border-bottom-color: var(--gold); }
+    #lead-form input::placeholder, #lead-form textarea::placeholder {
+      color: var(--cream-faint); font-style: italic;
+    }
+    #lead-form input:-webkit-autofill,
+    #lead-form input:-webkit-autofill:focus {
+      -webkit-text-fill-color: var(--cream);
+      -webkit-box-shadow: 0 0 0 1000px var(--bg) inset;
+      caret-color: var(--cream);
+    }
+    #lead-form textarea { resize: none; height: 80px; }
+
+    /* ══════════════════════════════
+       DONE
+    ══════════════════════════════ */
+    .done-title {
+      font-size: clamp(40px,7vw,80px); font-weight: 300;
+      text-align: center; margin-bottom: 16px; letter-spacing: .04em;
+    }
+    .done-sub {
+      font-size: 16px; font-style: italic; color: var(--cream-dim);
+      text-align: center; line-height: 1.8; margin-bottom: 52px;
+    }
+
+    /* ══════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════ */
+    @media (min-width: 480px) {
+      .btn-group { flex-direction: row; }
+      .btn { width: auto; }
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Hidden form for Netlify build-time detection -->
-  <form name="tattoo-request" data-netlify="true" hidden>
-    <input type="text" name="name" />
-    <input type="email" name="email" />
-    <textarea name="note"></textarea>
-    <input type="text" name="prompt" />
-  </form>
+<!-- Progress bar -->
+<div id="progress-bar"></div>
+<!-- Step counter -->
+<div id="step-counter"></div>
+<!-- Back button -->
+<button id="back-btn">← geri</button>
 
-  <main id="app">
+<!-- Netlify form detection -->
+<form name="tattoo-request" data-netlify="true" hidden>
+  <input type="text" name="name" />
+  <input type="email" name="email" />
+  <textarea name="note"></textarea>
+  <input type="text" name="prompt" />
+</form>
 
-    <!-- 1. LANDING -->
-    <section class="screen active" id="screen-landing">
-      <div class="content">
-        <h1 class="logo">CAN LEVI</h1>
-        <p class="tagline">Senin hikâyenden bir çizgi.</p>
-        <button class="btn primary" data-action="start">Başla</button>
+<main id="app">
+
+  <!-- 1. LANDING -->
+  <section class="screen active" id="screen-landing">
+    <div class="landing-eyebrow">İstanbul — Dövme Sanatçısı</div>
+    <h1 class="landing-name">CAN LEVI</h1>
+    <div class="v-rule-long"></div>
+    <p class="landing-tagline">Senin hikâyenden bir çizgi.</p>
+    <button class="enter-btn" data-action="start">Başla</button>
+  </section>
+
+  <!-- 2. QUESTIONS -->
+  <section class="screen" id="screen-questions">
+    <div class="q-label" id="q-label">01 — 06</div>
+    <h2 class="q-text" id="question-text"></h2>
+    <div id="options"></div>
+  </section>
+
+  <!-- 3. LOADING -->
+  <section class="screen" id="screen-loading">
+    <p class="loading-text">
+      Senin çizgini buluyorum<span class="dots"><span>.</span><span>.</span><span>.</span></span>
+    </p>
+  </section>
+
+  <!-- 4. QUIZ RESULT -->
+  <section class="screen" id="screen-quiz-result">
+    <div class="oracle-eyebrow">Senin Çizgin</div>
+    <div class="result-card">
+      <div class="result-row">
+        <span class="result-label">TEMA</span>
+        <span class="result-value" id="r-tema"></span>
       </div>
-    </section>
-
-    <!-- 2. QUESTIONS -->
-    <section class="screen" id="screen-questions">
-      <div class="content">
-        <div class="progress" id="progress">01/05</div>
-        <h2 class="question" id="question-text"></h2>
-        <div class="options" id="options"></div>
+      <div class="result-row">
+        <span class="result-label">FORM</span>
+        <span class="result-value" id="r-form"></span>
       </div>
-    </section>
-
-    <!-- 3. LOADING -->
-    <section class="screen" id="screen-loading">
-      <div class="content center">
-        <div class="loader"></div>
-        <p class="loading-text">Senin çizgini buluyorum...</p>
+      <div class="result-row" id="r-stil-row">
+        <span class="result-label">STİL</span>
+        <span class="result-value" id="r-stil"></span>
       </div>
-    </section>
-
-    <!-- 4. QUIZ RESULT -->
-    <section class="screen" id="screen-quiz-result">
-      <div class="content">
-        <p class="label">Senin çizgin</p>
-        <div class="result-card">
-          <div class="result-row">
-            <span class="result-label">TEMA</span>
-            <span class="result-value" id="r-tema"></span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">FORM</span>
-            <span class="result-value" id="r-form"></span>
-          </div>
-          <div class="result-row" id="r-stil-row">
-            <span class="result-label">STİL</span>
-            <span class="result-value" id="r-stil"></span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">BOYUT</span>
-            <span class="result-value" id="r-boyut"></span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">YERLEŞİM</span>
-            <span class="result-value" id="r-yerlesim"></span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">HİS</span>
-            <span class="result-value" id="r-his"></span>
-          </div>
-          <div class="result-poem" id="r-siir"></div>
-        </div>
-        <button class="btn primary" data-action="quiz-to-form">Bu benimle, devam et</button>
-        <button class="btn ghost" data-action="to-wheel">Çarkı çevir</button>
+      <div class="result-row">
+        <span class="result-label">BOYUT</span>
+        <span class="result-value" id="r-boyut"></span>
       </div>
-    </section>
-
-    <!-- 5. WHEEL -->
-    <section class="screen" id="screen-wheel">
-      <div class="content center">
-        <p class="label">Şansına bırak</p>
-        <div class="wheel-container">
-          <div class="wheel-pointer">▼</div>
-          <canvas id="wheel-canvas" width="300" height="300"></canvas>
-        </div>
-        <button class="btn primary" id="spin-btn">Çarkı Çevir</button>
+      <div class="result-row">
+        <span class="result-label">YERLEŞİM</span>
+        <span class="result-value" id="r-yerlesim"></span>
       </div>
-    </section>
-
-    <!-- 6. WHEEL RESULT -->
-    <section class="screen" id="screen-wheel-result">
-      <div class="content">
-        <p class="label">Çarkın seçimi</p>
-        <div class="result-card">
-          <div class="result-row">
-            <span class="result-label">TEMA</span>
-            <span class="result-value" id="wr-tema"></span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">FORM</span>
-            <span class="result-value" id="wr-form"></span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">BOYUT</span>
-            <span class="result-value" id="wr-boyut"></span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">YERLEŞİM</span>
-            <span class="result-value" id="wr-yerlesim"></span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">HİS</span>
-            <span class="result-value" id="wr-his"></span>
-          </div>
-          <div class="result-poem" id="wr-siir"></div>
-        </div>
-        <button class="btn primary" data-action="wheel-to-form">Bu benimle, devam et</button>
-        <button class="btn ghost" data-action="respin">Tekrar çevir</button>
+      <div class="result-row">
+        <span class="result-label">HİS</span>
+        <span class="result-value" id="r-his"></span>
       </div>
-    </section>
+      <div class="result-poem" id="r-siir"></div>
+    </div>
+    <p class="oracle-note">
+      Bu bir yön, <strong>henüz son form değil.</strong><br>
+      Seninmiş gibi hissettiriyorsa — benimle paylaş.
+    </p>
+    <div class="btn-group">
+      <button class="btn primary" data-action="quiz-to-form">Can Levi'ye gönder</button>
+      <button class="btn ghost" data-action="to-wheel">Çarkı çevir</button>
+    </div>
+  </section>
 
-    <!-- 7. FORM -->
-    <section class="screen" id="screen-form">
-      <div class="content">
-        <h2>Son adım</h2>
-        <p class="muted">Bilgilerini bırak, sana dönerim.</p>
-        <form
-          id="lead-form"
-          name="tattoo-request"
-          method="POST"
-          data-netlify="true"
-          netlify-honeypot="bot-field"
-        >
-          <input type="hidden" name="form-name" value="tattoo-request" />
-          <p hidden><label>Don't fill: <input name="bot-field" /></label></p>
-          <input type="hidden" name="prompt" id="hidden-prompt" />
+  <!-- 5. WHEEL -->
+  <section class="screen" id="screen-wheel">
+    <div class="wheel-eyebrow">Şansına bırak</div>
+    <div class="wheel-wrap">
+      <div class="wheel-pointer">▼</div>
+      <canvas id="wheel-canvas" width="300" height="300"></canvas>
+    </div>
+    <div class="btn-group" style="justify-content:center">
+      <button class="btn primary" id="spin-btn">Çarkı Çevir</button>
+    </div>
+  </section>
 
-          <label>
-            <span>İsim</span>
-            <input type="text" name="name" required />
-          </label>
-          <label>
-            <span>Email</span>
-            <input type="email" name="email" required />
-          </label>
-          <label>
-            <span>Ek not (opsiyonel)</span>
-            <textarea name="note" rows="4"></textarea>
-          </label>
-
-          <button class="btn primary" type="submit">Gönder</button>
-        </form>
+  <!-- 6. WHEEL RESULT -->
+  <section class="screen" id="screen-wheel-result">
+    <div class="oracle-eyebrow">Çarkın Seçimi</div>
+    <div class="result-card">
+      <div class="result-row">
+        <span class="result-label">TEMA</span>
+        <span class="result-value" id="wr-tema"></span>
       </div>
-    </section>
-
-    <!-- 8. CONFIRMATION -->
-    <section class="screen" id="screen-done">
-      <div class="content center">
-        <h2>Aldım, görüşürüz.</h2>
-        <p class="muted">Sana en kısa sürede dönüş yapacağım.</p>
-        <a class="btn ghost" href="https://www.instagram.com/can_levi/" target="_blank" rel="noopener">Instagram</a>
+      <div class="result-row">
+        <span class="result-label">FORM</span>
+        <span class="result-value" id="wr-form"></span>
       </div>
-    </section>
+      <div class="result-row">
+        <span class="result-label">BOYUT</span>
+        <span class="result-value" id="wr-boyut"></span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">YERLEŞİM</span>
+        <span class="result-value" id="wr-yerlesim"></span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">HİS</span>
+        <span class="result-value" id="wr-his"></span>
+      </div>
+      <div class="result-poem" id="wr-siir"></div>
+    </div>
+    <div class="btn-group">
+      <button class="btn primary" data-action="wheel-to-form">Can Levi'ye gönder</button>
+      <button class="btn ghost" data-action="respin">Tekrar çevir</button>
+    </div>
+  </section>
 
-  </main>
+  <!-- 7. FORM -->
+  <section class="screen" id="screen-form">
+    <h2 class="form-title">Birlikte şekillendirelim.</h2>
+    <p class="form-sub">Bilgilerini bırak,<br><em>sana dönerim.</em></p>
+    <form
+      id="lead-form"
+      name="tattoo-request"
+      method="POST"
+      data-netlify="true"
+      netlify-honeypot="bot-field"
+    >
+      <input type="hidden" name="form-name" value="tattoo-request" />
+      <p hidden><label>Don't fill: <input name="bot-field" /></label></p>
+      <input type="hidden" name="prompt" id="hidden-prompt" />
+      <label>
+        <span>İsim</span>
+        <input type="text" name="name" placeholder="Adın" required />
+      </label>
+      <label>
+        <span>E-posta</span>
+        <input type="email" name="email" placeholder="E-posta adresin" required />
+      </label>
+      <label>
+        <span>Eklemek istediğin (opsiyonel)</span>
+        <textarea name="note" placeholder="Aklında olan bir şey varsa..."></textarea>
+      </label>
+      <button class="btn primary" type="submit" style="margin-top:8px">Gönder</button>
+    </form>
+  </section>
 
-  <script src="script.js"></script>
+  <!-- 8. DONE -->
+  <section class="screen" id="screen-done">
+    <div class="v-rule-long"></div>
+    <h2 class="done-title">Aldım.</h2>
+    <p class="done-sub">En kısa sürede<br><em>sana döneceğim.</em></p>
+    <a class="btn ghost" href="https://www.instagram.com/can_levi/" target="_blank" rel="noopener" style="width:auto;display:inline-block">@can_levi</a>
+  </section>
+
+</main>
+
+<script>
+/* ══════════════════════════════════════════════
+   DATA — unchanged from original
+══════════════════════════════════════════════ */
+const questions = [
+  { key:"soru1", text:"Bu dövme sana ne hatırlatmalı?", options:["Bir kişiyi","Bir dönemi","Bir kararı","Hiçbir şeyi — sadece güzel olsun"] },
+  { key:"soru_style", type:"visual", text:"Hangisi sana daha çok hitap ediyor?", options:[
+    { value:"fine-line",    label:"İnce",     img:"images/fineline.png",    alt:"Fine Line" },
+    { value:"blackwork",    label:"Dolgun",   img:"images/blackwork.png",   alt:"Blackwork" },
+    { value:"illustrative", label:"Çizimsel", img:"images/illustrative.png",alt:"Illustrative" },
+    { value:"geometric",    label:"Şekilsel", img:"images/geometric.png",   alt:"Geometric" }
+  ]},
+  { key:"soru2", text:"Vücudunda nereyi düşünüyorsun?", options:["Kol","Bacak","Sırt / Göğüs","Henüz bilmiyorum"] },
+  { key:"soru3", text:"Boyut olarak?", options:["Küçük, fark edilmesin","Orta, dengeli","Büyük, statement"] },
+  { key:"soru4", text:"Hangi his daha yakın?", options:["Keskin ve güçlü","Yumuşak ve akışkan","Kaotik ve serbest","Minimal ve sessiz"] },
+  { key:"soru5", text:"Bu dövme sana ne versin?", options:["Hatırlama","Cesaret","Huzur","Sadece estetik"] }
+];
+
+const styleMapping = {
+  "fine-line":"ince çizgiler, detaylı ve zarif",
+  "blackwork":"dolgun siyah alanlar, güçlü kontrastlar",
+  "illustrative":"çizimsel, hikaye anlatan",
+  "geometric":"geometrik formlar, keskin açılar"
+};
+
+const keyMap = {
+  soru1:{"Bir kişiyi":"kisiyi","Bir dönemi":"donemi","Bir kararı":"karari","Hiçbir şeyi — sadece güzel olsun":"estetik"},
+  soru3:{"Küçük, fark edilmesin":"kucuk","Orta, dengeli":"orta","Büyük, statement":"buyuk"},
+  soru4:{"Keskin ve güçlü":"keskin","Yumuşak ve akışkan":"yumusak","Kaotik ve serbest":"kaotik","Minimal ve sessiz":"minimal"}
+};
+
+function makeKey(s1,s3,s4){return `${keyMap.soru1[s1]}_${keyMap.soru3[s3]}_${keyMap.soru4[s4]}`;}
+
+const combinations = {
+  "kisiyi_kucuk_minimal":{tema:"Anı",form:"Tek çizgi, kesintisiz, neredeyse soyut",boyut:"2–4cm",yerlesim:"Bilek içi veya parmak yanı",his:"Sessiz sadakat",siir:"Birinin varlığını fısıldar gibi taşıyacak.\nGörünmez ama her zaman orada."},
+  "kisiyi_kucuk_keskin":{tema:"Özlem",form:"İnce, keskin hatlar — bir tarih ya da koordinat gibi",boyut:"2–4cm",yerlesim:"Boyun altı veya kaburga",his:"Derin, keskin",siir:"Uzaklık ölçülmez.\nAma bu iz her zaman yakın."},
+  "kisiyi_orta_yumusak":{tema:"Bağlılık",form:"Akışkan, organik bir form — belki bir siluet",boyut:"6–8cm",yerlesim:"Ön kol veya köprücük kemiği",his:"Sıcak, sakin",siir:"Sevgi her zaman söze ihtiyaç duymaz.\nBazen sadece ciltte bir şekil yeterlidir."},
+  "kisiyi_buyuk_yumusak":{tema:"Sevgi",form:"Geniş, sarmalayan formlar — yumuşak geçişler",boyut:"12–15cm",yerlesim:"Sırt veya göğüs",his:"Derin, kucaklayıcı",siir:"Bazı insanlar iz bırakmaz.\nSen iz bırakmalarına izin verdin. Bu güzel."},
+  "kisiyi_buyuk_kaotik":{tema:"Kayıp",form:"Dağınık, parçalı çizgiler — tamamlanmamış formlar",boyut:"15cm+",yerlesim:"Sırt veya uyluk",his:"Ağır, dürüst",siir:"Kayıp düzgün durmaz.\nBu çizgiler de durmuyor. İkisi de gerçek."},
+  "donemi_kucuk_minimal":{tema:"Geçiş",form:"Soyut bir nokta, virgül ya da yatay çizgi",boyut:"1–3cm",yerlesim:"Bilek veya parmak",his:"Hafif, nefes gibi",siir:"O dönem kapandı.\nBu küçük iz, kapıyı kapatan elin izi."},
+  "donemi_orta_keskin":{tema:"Kapanış",form:"Geometrik, köşeli hatlar — belki kırık bir şekil",boyut:"6–10cm",yerlesim:"Ön kol veya baldır",his:"Kararlı, net",siir:"O dönem bitti.\nBu iz, geride kalanın değil, ileriye bakışın sembolü."},
+  "donemi_orta_yumusak":{tema:"Dönüşüm",form:"Organik, akışkan çizgiler — bir şeyin başka bir şeye evrimi",boyut:"6–9cm",yerlesim:"Kol veya köprücük kemiği",his:"Huzurlu ama güçlü",siir:"Geçmişi değil, ondan öğrendiklerini taşıyacak bir iz.\nKüçük ama unutulmaz."},
+  "donemi_buyuk_kaotik":{tema:"Kırılma",form:"Serbest fırça darbeleri, düzensiz geometri",boyut:"15cm+",yerlesim:"Sırt veya uyluk",his:"Ham, dürüst",siir:"Bazı dönemler nazikçe bitmez.\nBu dövme o gerçeği gizlemiyor."},
+  "donemi_buyuk_keskin":{tema:"Son",form:"Keskin, net geometri — bir kapı ya da çerçeve",boyut:"12–18cm",yerlesim:"Sırt ortası veya göğüs",his:"Ağır, kalıcı",siir:"Her son bir başlangıca zemin hazırlar.\nBu iz o zemini işaret ediyor."},
+  "karari_kucuk_minimal":{tema:"Odak",form:"Tek bir sembol, geometrik ve yalın",boyut:"2–3cm",yerlesim:"Bilek içi veya parmak",his:"Sessiz, güçlü",siir:"Büyük kararlar küçük anlarda alınır.\nBu iz o anı tutuyor."},
+  "karari_orta_keskin":{tema:"Kararlılık",form:"Keskin, belirgin hatlar — hiçbir belirsizlik yok",boyut:"6–10cm",yerlesim:"Ön kol veya baldır",his:"Net, güçlü",siir:"Bu karar kolay olmadı.\nAma doğruydu. Her baktığında hatırlayacaksın."},
+  "karari_orta_yumusak":{tema:"Denge",form:"Akışkan ama yapılandırılmış — yin-yang enerjisi",boyut:"6–8cm",yerlesim:"Kol veya göğüs",his:"Huzurlu, kararlı",siir:"Zor kararlar bazen en yumuşak yerlere yerleşir.\nOrası senin kararın için doğru yer."},
+  "karari_buyuk_keskin":{tema:"İrade",form:"Güçlü, simetrik geometri — bir ok ya da yapı",boyut:"12–18cm",yerlesim:"Sırt veya göğüs",his:"Baskın, kalıcı",siir:"Herkes karar verir.\nAz kişi kararının üstünde durur. Sen duruyorsun."},
+  "karari_buyuk_kaotik":{tema:"İsyan",form:"Dağınık, agresif çizgiler — kural tanımayan bir enerji",boyut:"15cm+",yerlesim:"Sırt, göğüs veya uyluk",his:"Yoğun, özgür",siir:"Bu karar sistemin onayladığı türden değildi.\nVe bu onu daha gerçek yapıyor."},
+  "estetik_kucuk_minimal":{tema:"Sadelik",form:"Tek bir çizgi, yalın ve mükemmel",boyut:"1–3cm",yerlesim:"Parmak, bilek ya da kulak arkası",his:"Dingin, zarif",siir:"Anlam aramıyorsun.\nSadece güzel bir şey istiyorsun. Bu da bir cesaret."},
+  "estetik_orta_keskin":{tema:"Güç",form:"Keskin, net formlar — saf estetik enerji",boyut:"6–10cm",yerlesim:"Kol veya bacak",his:"Etkileyici, özgüvenli",siir:"Güzellik kendi başına bir mesaj taşır.\nVe bu mesaj yeterince güçlü."},
+  "estetik_orta_yumusak":{tema:"Ritim",form:"Yumuşak, tekrarlayan formlar — neredeyse müzikal",boyut:"7–10cm",yerlesim:"Kol, omuz veya böğür",his:"Akışkan, estetik",siir:"Güzellik bazen bir ritimdir.\nSen o ritmi taşımak istiyorsun."},
+  "estetik_buyuk_yumusak":{tema:"Akış",form:"Geniş, serbest akışkan formlar — soyut ve zarif",boyut:"15cm+",yerlesim:"Sırt veya uyluk",his:"Özgür, etkileyici",siir:"Bu dövme bir şey söylemek zorunda değil.\nSadece var olması yeterli."},
+  "estetik_buyuk_kaotik":{tema:"Özgürlük",form:"Serbest fırça darbeleri, kontrolsüz enerji",boyut:"15cm+",yerlesim:"Sırt, göğüs veya uyluk",his:"Taşkın, enerjik",siir:"Anlam aramıyorsun.\nSadece var olmak istiyorsun. Bu da bir anlam aslında."}
+};
+
+const fallback = {
+  tema:{"Bir kişiyi":"Bağ","Bir dönemi":"Dönüşüm","Bir kararı":"İrade","Hiçbir şeyi — sadece güzel olsun":"Form"},
+  form:{"Keskin ve güçlü":"Keskin hatlar, güçlü kontrastlar","Yumuşak ve akışkan":"Yumuşak geçişler, akışkan formlar","Kaotik ve serbest":"Serbest çizgiler, kontrolsüz enerji","Minimal ve sessiz":"Minimal, neredeyse fısıltı gibi"},
+  boyut:{"Küçük, fark edilmesin":"2–4cm, gizli bir işaret","Orta, dengeli":"6–10cm, dengeli bir alan","Büyük, statement":"15cm+, geniş bir ifade"},
+  yerlesim:{"Kol":"Kol iç yüzeyi veya ön kol","Bacak":"Baldır veya bacak hattı","Sırt / Göğüs":"Sırt ortası veya göğüs","Henüz bilmiyorum":"Esnek — birlikte karar veririz"},
+  his:{"Hatırlama":"Sakin, içe dönük","Cesaret":"Güçlü, kararlı","Huzur":"Yumuşak, dengeleyici","Sadece estetik":"Özgür, sınırsız"},
+  siir:{"Bir kişiyi":"Bazı izler görünmez ama her zaman hissedilir.\nBu da böyle olacak.","Bir dönemi":"Her dönem bir şey öğretir.\nBu dövme o öğretinin kalıcı izi.","Bir kararı":"Kararlar bazen sessiz, bazen gürültülü gelir.\nBu, seninki.","Hiçbir şeyi — sadece güzel olsun":"Bazen güzellik kendi başına yeterlidir.\nVe bu yeterlilik bir güçtür."}
+};
+
+const wheelItems = [
+  {tema:"Metamorfoz",form:"Kelebek silüeti, tek çizgi",boyut:"5–7cm",yerlesim:"Omuz veya ayak bileği",his:"Hafif, umutlu",siir:"Değişim kaçınılmaz.\nBu iz, dönüşümü kucaklayan."},
+  {tema:"Kök",form:"İnce dallanmalar, organik",boyut:"8–12cm",yerlesim:"Ön kol veya baldır",his:"Sağlam, topraklı",siir:"Nereden geldiğini unutma.\nKöklerin seni taşıyor."},
+  {tema:"Dalga",form:"Akışkan çizgiler, su hareketi",boyut:"6–10cm",yerlesim:"Bilek veya ayak bileği",his:"Sakin, akışkan",siir:"Suya karşı yüzme.\nOnunla ak."},
+  {tema:"Göz",form:"Stilize göz, minimal detay",boyut:"3–5cm",yerlesim:"El üstü veya ense",his:"Koruyucu, uyanık",siir:"Her şeyi görüyorsun.\nBu iz seni koruyor."},
+  {tema:"Ay",form:"Hilal veya dolunay, ince çizgi",boyut:"4–6cm",yerlesim:"Bilek veya köprücük kemiği",his:"Gizemli, sakin",siir:"Karanlıkta bile ışık var.\nSen o ışıksın."},
+  {tema:"Yılan",form:"Kıvrımlı siluet, minimal",boyut:"8–15cm",yerlesim:"Kol sarmal veya baldır",his:"Güçlü, dönüştürücü",siir:"Eski deriyi bırak.\nYeniden doğ."},
+  {tema:"Geometri",form:"Keskin açılar, simetri",boyut:"5–8cm",yerlesim:"Ön kol veya bilek",his:"Düzenli, kontrollü",siir:"Kaosun içinde düzen arıyorsun.\nİşte burada."},
+  {tema:"Kuş",form:"Uçuş silüeti, tek çizgi",boyut:"4–8cm",yerlesim:"Köprücük kemiği veya sırt",his:"Özgür, hafif",siir:"Kafesi kır.\nKanatların seni bekliyor."}
+];
+
+const segColors=["#16213e","#2d1b33","#1a2e1a","#3b1a1a","#1b2a2e","#2e2616","#1e1e2e","#2e1b25"];
+
+/* ══════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════ */
+const state = { currentQuestion:0, answers:{}, quizResult:null, wheelResult:null };
+
+/* ══════════════════════════════════════════════
+   SCREENS
+══════════════════════════════════════════════ */
+const screens = {
+  landing:     document.getElementById("screen-landing"),
+  questions:   document.getElementById("screen-questions"),
+  loading:     document.getElementById("screen-loading"),
+  quizResult:  document.getElementById("screen-quiz-result"),
+  wheel:       document.getElementById("screen-wheel"),
+  wheelResult: document.getElementById("screen-wheel-result"),
+  form:        document.getElementById("screen-form"),
+  done:        document.getElementById("screen-done")
+};
+
+const progressBar  = document.getElementById("progress-bar");
+const stepCounter  = document.getElementById("step-counter");
+const backBtn      = document.getElementById("back-btn");
+
+const TOTAL_Q = questions.length;
+
+function setProgress(pct){ progressBar.style.width = pct + "%"; }
+
+function showScreen(name){
+  Object.values(screens).forEach(s => s.classList.remove("active"));
+  screens[name].classList.add("active");
+
+  // UI chrome
+  const isQ = name === "questions";
+  stepCounter.style.display = isQ ? "block" : "none";
+  // back only during questions (not first) or form
+  backBtn.style.display = (isQ && state.currentQuestion > 0) || name === "form" ? "block" : "none";
+
+  // progress
+  const pctMap = {
+    landing:0, questions: ((state.currentQuestion+1)/TOTAL_Q)*60,
+    loading:72, quizResult:85, wheelResult:85,
+    wheel:65, form:92, done:100
+  };
+  setProgress(pctMap[name] ?? 0);
+}
+
+/* ══════════════════════════════════════════════
+   QUESTIONS
+══════════════════════════════════════════════ */
+function pad(n){ return n.toString().padStart(2,"0"); }
+
+function renderQuestion(){
+  const q = questions[state.currentQuestion];
+  document.getElementById("q-label").textContent = `${pad(state.currentQuestion+1)} — ${pad(TOTAL_Q)}`;
+  document.getElementById("question-text").textContent = q.text;
+  backBtn.style.display = state.currentQuestion > 0 ? "block" : "none";
+
+  const optEl = document.getElementById("options");
+  optEl.innerHTML = "";
+
+  if(q.type === "visual"){
+    const grid = document.createElement("div");
+    grid.className = "visual-options";
+    q.options.forEach(opt => {
+      const card = document.createElement("div");
+      card.className = "visual-card";
+      card.dataset.value = opt.value;
+      card.innerHTML = `<img src="${opt.img}" alt="${opt.alt}" loading="lazy"><span>${opt.label}</span>`;
+      card.addEventListener("click", () => {
+        document.querySelectorAll(".visual-card").forEach(c => c.classList.remove("selected"));
+        card.classList.add("selected");
+        setTimeout(() => selectOption(opt.value), 320);
+      });
+      grid.appendChild(card);
+    });
+    optEl.appendChild(grid);
+  } else {
+    optEl.className = "options";
+    q.options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "option";
+      btn.textContent = opt;
+      btn.addEventListener("click", () => selectOption(opt));
+      optEl.appendChild(btn);
+    });
+  }
+}
+
+function selectOption(value){
+  const q = questions[state.currentQuestion];
+  state.answers[q.key] = value;
+  state.currentQuestion++;
+
+  if(state.currentQuestion < questions.length){
+    renderQuestion();
+    setProgress(((state.currentQuestion+1)/TOTAL_Q)*60);
+    stepCounter.textContent = `${pad(state.currentQuestion+1)} — ${pad(TOTAL_Q)}`;
+  } else {
+    buildResult();
+    showScreen("loading");
+    setTimeout(() => { renderResult(); showScreen("quizResult"); }, 2400);
+  }
+}
+
+/* ══════════════════════════════════════════════
+   RESULT
+══════════════════════════════════════════════ */
+function buildResult(){
+  const a = state.answers;
+  const key = makeKey(a.soru1, a.soru3, a.soru4);
+  state.quizResult = combinations[key] ? {...combinations[key]} : {
+    tema:fallback.tema[a.soru1], form:fallback.form[a.soru4],
+    boyut:fallback.boyut[a.soru3], yerlesim:fallback.yerlesim[a.soru2],
+    his:fallback.his[a.soru5], siir:fallback.siir[a.soru1]
+  };
+  state.quizResult.stil = styleMapping[a.soru_style] || null;
+}
+
+function renderResult(){
+  const r = state.quizResult;
+  document.getElementById("r-tema").textContent = r.tema;
+  document.getElementById("r-form").textContent = r.form;
+  document.getElementById("r-boyut").textContent = r.boyut;
+  document.getElementById("r-yerlesim").textContent = r.yerlesim;
+  document.getElementById("r-his").textContent = r.his;
+  document.getElementById("r-siir").textContent = `"${r.siir}"`;
+  const stilRow = document.getElementById("r-stil-row");
+  if(r.stil){ document.getElementById("r-stil").textContent = r.stil; stilRow.style.display=""; }
+  else { stilRow.style.display="none"; }
+}
+
+/* ══════════════════════════════════════════════
+   WHEEL
+══════════════════════════════════════════════ */
+let wheelAngle = 0, wheelSpinning = false;
+
+function drawWheel(rotation, highlightIndex){
+  const canvas = document.getElementById("wheel-canvas");
+  const ctx = canvas.getContext("2d");
+  const size = canvas.width, cx = size/2, cy = size/2, r = cx-6;
+  const n = wheelItems.length, arc = (2*Math.PI)/n;
+  ctx.clearRect(0,0,size,size);
+  for(let i=0;i<n;i++){
+    const sa = rotation - Math.PI/2 + i*arc, ea = sa+arc;
+    const hi = highlightIndex===i;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,sa,ea); ctx.closePath();
+    ctx.fillStyle = hi ? "#3d3550" : segColors[i]; ctx.fill();
+    ctx.strokeStyle="#1a1a1a"; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(sa+arc/2); ctx.textAlign="right";
+    ctx.fillStyle = hi ? "#ede8df" : "rgba(237,232,223,0.5)";
+    ctx.font = `${hi?"400 ":"300 "}11px 'Cormorant Garamond', serif`;
+    ctx.fillText(wheelItems[i].tema, r-14, 4); ctx.restore();
+  }
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,2*Math.PI);
+  ctx.strokeStyle="#333"; ctx.lineWidth=2; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx,cy,14,0,2*Math.PI);
+  ctx.fillStyle="#070707"; ctx.fill();
+  ctx.strokeStyle="rgba(201,184,154,0.3)"; ctx.lineWidth=1.5; ctx.stroke();
+}
+
+function spinWheel(){
+  if(wheelSpinning) return;
+  wheelSpinning = true;
+  const spinBtn = document.getElementById("spin-btn");
+  spinBtn.disabled = true;
+  const n=wheelItems.length, arc=(2*Math.PI)/n;
+  const selectedIndex=Math.floor(Math.random()*n);
+  const targetFinal = -(selectedIndex*arc + arc/2);
+  let extra = ((targetFinal-wheelAngle)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);
+  if(extra<0.5) extra+=2*Math.PI;
+  const startAngle=wheelAngle, endAngle=wheelAngle+5*2*Math.PI+extra;
+  const duration=4200; let startTime=null;
+  function animate(ts){
+    if(!startTime) startTime=ts;
+    const elapsed=Math.min(ts-startTime,duration), t=elapsed/duration;
+    const eased=1-Math.pow(1-t,3);
+    const angle=startAngle+(endAngle-startAngle)*eased;
+    const done=elapsed>=duration;
+    drawWheel(angle, done?selectedIndex:-1);
+    if(!done){ requestAnimationFrame(animate); }
+    else {
+      wheelAngle=endAngle; wheelSpinning=false; spinBtn.disabled=false;
+      showWheelResult(selectedIndex);
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+function showWheelResult(index){
+  const item=wheelItems[index];
+  document.getElementById("wr-tema").textContent=item.tema;
+  document.getElementById("wr-form").textContent=item.form;
+  document.getElementById("wr-boyut").textContent=item.boyut;
+  document.getElementById("wr-yerlesim").textContent=item.yerlesim;
+  document.getElementById("wr-his").textContent=item.his;
+  document.getElementById("wr-siir").textContent=`"${item.siir}"`;
+  state.wheelResult=item;
+  showScreen("wheelResult");
+}
+
+/* ══════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════ */
+function resultToPrompt(r){
+  return [
+    `TEMA: ${r.tema}`, `FORM: ${r.form}`,
+    r.stil ? `STİL: ${r.stil}` : null,
+    `BOYUT: ${r.boyut}`, `YERLEŞİM: ${r.yerlesim}`,
+    `HİS: ${r.his}`, r.siir
+  ].filter(Boolean).join("\n");
+}
+
+/* ══════════════════════════════════════════════
+   EVENT LISTENERS
+══════════════════════════════════════════════ */
+document.querySelector('[data-action="start"]').addEventListener("click",()=>{
+  state.currentQuestion=0; state.answers={}; state.quizResult=null;
+  renderQuestion(); showScreen("questions");
+});
+
+document.querySelector('[data-action="to-wheel"]').addEventListener("click",()=>{
+  showScreen("wheel"); drawWheel(wheelAngle,-1);
+});
+
+document.getElementById("spin-btn").addEventListener("click", spinWheel);
+
+document.querySelector('[data-action="respin"]').addEventListener("click",()=>{
+  showScreen("wheel"); drawWheel(wheelAngle,-1); spinWheel();
+});
+
+document.querySelector('[data-action="quiz-to-form"]').addEventListener("click",()=>{
+  document.getElementById("hidden-prompt").value = resultToPrompt(state.quizResult);
+  showScreen("form");
+});
+
+document.querySelector('[data-action="wheel-to-form"]').addEventListener("click",()=>{
+  document.getElementById("hidden-prompt").value = resultToPrompt(state.wheelResult);
+  showScreen("form");
+});
+
+backBtn.addEventListener("click",()=>{
+  if(document.getElementById("screen-form").classList.contains("active")){
+    showScreen("quizResult"); return;
+  }
+  if(state.currentQuestion > 0){
+    state.currentQuestion--;
+    renderQuestion();
+    setProgress(((state.currentQuestion+1)/TOTAL_Q)*60);
+  }
+});
+
+document.getElementById("lead-form").addEventListener("submit",(e)=>{
+  e.preventDefault();
+  const form=e.target, data=new FormData(form);
+  fetch("/",{
+    method:"POST",
+    headers:{"Content-Type":"application/x-www-form-urlencoded"},
+    body: new URLSearchParams(data).toString()
+  }).then(()=>showScreen("done")).catch(()=>showScreen("done"));
+});
+</script>
 </body>
 </html>
