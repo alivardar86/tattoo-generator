@@ -348,7 +348,8 @@ const segColors = [
 const state = {
   currentQuestion: 0,
   answers: {},
-  result: null
+  quizResult: null,
+  wheelResult: null
 };
 
 // --- SCREENS ---
@@ -412,10 +413,10 @@ function buildResult() {
   const key = makeKey(a.soru1, a.soru3, a.soru4);
 
   if (combinations[key]) {
-    state.result = combinations[key];
+    state.quizResult = combinations[key];
   } else {
     // Fallback: compose from individual answers
-    state.result = {
+    state.quizResult = {
       tema: fallback.tema[a.soru1],
       form: fallback.form[a.soru4],
       boyut: fallback.boyut[a.soru3],
@@ -428,7 +429,7 @@ function buildResult() {
 
 // --- RENDER RESULT CARD ---
 function renderResult() {
-  const r = state.result;
+  const r = state.quizResult;
   document.getElementById("r-tema").textContent = r.tema;
   document.getElementById("r-form").textContent = r.form;
   document.getElementById("r-boyut").textContent = r.boyut;
@@ -552,7 +553,7 @@ function showWheelResult(index) {
   document.getElementById("wr-yerlesim").textContent = item.yerlesim;
   document.getElementById("wr-his").textContent = item.his;
   document.getElementById("wr-siir").textContent = `"${item.siir}"`;
-  state.result = item;
+  state.wheelResult = item;
   document.getElementById("wheel-result").hidden = false;
 }
 
@@ -574,7 +575,7 @@ document.getElementById("spin-btn").addEventListener("click", spinWheel);
 document.getElementById("respin-btn").addEventListener("click", spinWheel);
 
 document.querySelector('[data-action="wheel-to-form"]').addEventListener("click", () => {
-  const r = state.result;
+  const r = state.wheelResult;
   const promptText = [
     `TEMA: ${r.tema}`,
     `FORM: ${r.form}`,
@@ -588,7 +589,7 @@ document.querySelector('[data-action="wheel-to-form"]').addEventListener("click"
 });
 
 document.querySelector('[data-action="to-form"]').addEventListener("click", () => {
-  const r = state.result;
+  const r = state.quizResult;
   const promptText = [
     `TEMA: ${r.tema}`,
     `FORM: ${r.form}`,
