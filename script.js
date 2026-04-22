@@ -265,6 +265,85 @@ const fallback = {
   }
 };
 
+// --- WHEEL PRESETS ---
+const wheelItems = [
+  {
+    tema: "Metamorfoz",
+    form: "Kelebek silüeti, tek çizgi",
+    boyut: "5–7cm",
+    yerlesim: "Omuz veya ayak bileği",
+    his: "Hafif, umutlu",
+    siir: "Değişim kaçınılmaz.\nBu iz, dönüşümü kucaklayan."
+  },
+  {
+    tema: "Kök",
+    form: "İnce dallanmalar, organik",
+    boyut: "8–12cm",
+    yerlesim: "Ön kol veya baldır",
+    his: "Sağlam, topraklı",
+    siir: "Nereden geldiğini unutma.\nKöklerin seni taşıyor."
+  },
+  {
+    tema: "Dalga",
+    form: "Akışkan çizgiler, su hareketi",
+    boyut: "6–10cm",
+    yerlesim: "Bilek veya ayak bileği",
+    his: "Sakin, akışkan",
+    siir: "Suya karşı yüzme.\nOnunla ak."
+  },
+  {
+    tema: "Göz",
+    form: "Stilize göz, minimal detay",
+    boyut: "3–5cm",
+    yerlesim: "El üstü veya ense",
+    his: "Koruyucu, uyanık",
+    siir: "Her şeyi görüyorsun.\nBu iz seni koruyor."
+  },
+  {
+    tema: "Ay",
+    form: "Hilal veya dolunay, ince çizgi",
+    boyut: "4–6cm",
+    yerlesim: "Bilek veya köprücük kemiği",
+    his: "Gizemli, sakin",
+    siir: "Karanlıkta bile ışık var.\nSen o ışıksın."
+  },
+  {
+    tema: "Yılan",
+    form: "Kıvrımlı siluet, minimal",
+    boyut: "8–15cm",
+    yerlesim: "Kol sarmal veya baldır",
+    his: "Güçlü, dönüştürücü",
+    siir: "Eski deriyi bırak.\nYeniden doğ."
+  },
+  {
+    tema: "Geometri",
+    form: "Keskin açılar, simetri",
+    boyut: "5–8cm",
+    yerlesim: "Ön kol veya bilek",
+    his: "Düzenli, kontrollü",
+    siir: "Kaosun içinde düzen arıyorsun.\nİşte burada."
+  },
+  {
+    tema: "Kuş",
+    form: "Uçuş silüeti, tek çizgi",
+    boyut: "4–8cm",
+    yerlesim: "Köprücük kemiği veya sırt",
+    his: "Özgür, hafif",
+    siir: "Kafesi kır.\nKanatların seni bekliyor."
+  }
+];
+
+const segColors = [
+  "#16213e",
+  "#2d1b33",
+  "#1a2e1a",
+  "#3b1a1a",
+  "#1b2a2e",
+  "#2e2616",
+  "#1e1e2e",
+  "#2e1b25"
+];
+
 // --- STATE ---
 const state = {
   currentQuestion: 0,
@@ -274,12 +353,13 @@ const state = {
 
 // --- SCREENS ---
 const screens = {
-  landing: document.getElementById("screen-landing"),
+  landing:   document.getElementById("screen-landing"),
   questions: document.getElementById("screen-questions"),
-  loading: document.getElementById("screen-loading"),
-  result: document.getElementById("screen-result"),
-  form: document.getElementById("screen-form"),
-  done: document.getElementById("screen-done")
+  loading:   document.getElementById("screen-loading"),
+  result:    document.getElementById("screen-result"),
+  wheel:     document.getElementById("screen-wheel"),
+  form:      document.getElementById("screen-form"),
+  done:      document.getElementById("screen-done")
 };
 
 function showScreen(name) {
@@ -357,6 +437,125 @@ function renderResult() {
   document.getElementById("r-siir").textContent = `"${r.siir}"`;
 }
 
+// --- WHEEL ---
+let wheelAngle = 0;
+let wheelSpinning = false;
+
+function drawWheel(rotation, highlightIndex) {
+  const canvas = document.getElementById("wheel-canvas");
+  const ctx = canvas.getContext("2d");
+  const size = canvas.width;
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = cx - 6;
+  const n = wheelItems.length;
+  const arc = (2 * Math.PI) / n;
+
+  ctx.clearRect(0, 0, size, size);
+
+  for (let i = 0; i < n; i++) {
+    const startAngle = rotation - Math.PI / 2 + i * arc;
+    const endAngle = startAngle + arc;
+    const isHighlighted = highlightIndex === i;
+
+    // Segment fill
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startAngle, endAngle);
+    ctx.closePath();
+    ctx.fillStyle = isHighlighted ? "#3d3550" : segColors[i];
+    ctx.fill();
+    ctx.strokeStyle = "#222";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Segment label
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(startAngle + arc / 2);
+    ctx.textAlign = "right";
+    ctx.fillStyle = isHighlighted ? "#ffffff" : "#aaaaaa";
+    ctx.font = `${isHighlighted ? "500 " : "300 "}11px Inter, sans-serif`;
+    ctx.fillText(wheelItems[i].tema, r - 14, 4);
+    ctx.restore();
+  }
+
+  // Outer ring
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+  ctx.strokeStyle = "#333";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Center cap
+  ctx.beginPath();
+  ctx.arc(cx, cy, 14, 0, 2 * Math.PI);
+  ctx.fillStyle = "#0a0a0a";
+  ctx.fill();
+  ctx.strokeStyle = "#444";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+}
+
+function spinWheel() {
+  if (wheelSpinning) return;
+  wheelSpinning = true;
+
+  const spinBtn = document.getElementById("spin-btn");
+  const wheelResultEl = document.getElementById("wheel-result");
+
+  wheelResultEl.hidden = true;
+  spinBtn.disabled = true;
+
+  const n = wheelItems.length;
+  const arc = (2 * Math.PI) / n;
+  const selectedIndex = Math.floor(Math.random() * n);
+
+  // Offset to land center of selectedIndex at top (−π/2)
+  const targetFinal = -(selectedIndex * arc + arc / 2);
+  let extra = ((targetFinal - wheelAngle) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+  if (extra < 0.5) extra += 2 * Math.PI; // ensure at least a partial last lap
+
+  const startAngle = wheelAngle;
+  const endAngle = wheelAngle + 5 * 2 * Math.PI + extra;
+  const duration = 4000;
+  let startTime = null;
+
+  function animate(timestamp) {
+    if (!startTime) startTime = timestamp;
+    const elapsed = Math.min(timestamp - startTime, duration);
+    const t = elapsed / duration;
+    const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic — fast start, slow end
+    const angle = startAngle + (endAngle - startAngle) * eased;
+    const done = elapsed >= duration;
+
+    drawWheel(angle, done ? selectedIndex : -1);
+
+    if (!done) {
+      requestAnimationFrame(animate);
+    } else {
+      wheelAngle = endAngle;
+      wheelSpinning = false;
+      spinBtn.disabled = false;
+      showWheelResult(selectedIndex);
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
+
+function showWheelResult(index) {
+  const item = wheelItems[index];
+  document.getElementById("wr-tema").textContent = item.tema;
+  document.getElementById("wr-form").textContent = item.form;
+  document.getElementById("wr-boyut").textContent = item.boyut;
+  document.getElementById("wr-yerlesim").textContent = item.yerlesim;
+  document.getElementById("wr-his").textContent = item.his;
+  document.getElementById("wr-siir").textContent = `"${item.siir}"`;
+  state.result = item;
+  document.getElementById("wheel-result").hidden = false;
+}
+
 // --- EVENT LISTENERS ---
 document.querySelector('[data-action="start"]').addEventListener("click", () => {
   state.currentQuestion = 0;
@@ -364,6 +563,28 @@ document.querySelector('[data-action="start"]').addEventListener("click", () => 
   state.result = null;
   renderQuestion();
   showScreen("questions");
+});
+
+document.querySelector('[data-action="to-wheel"]').addEventListener("click", () => {
+  showScreen("wheel");
+  drawWheel(wheelAngle, -1);
+});
+
+document.getElementById("spin-btn").addEventListener("click", spinWheel);
+document.getElementById("respin-btn").addEventListener("click", spinWheel);
+
+document.querySelector('[data-action="wheel-to-form"]').addEventListener("click", () => {
+  const r = state.result;
+  const promptText = [
+    `TEMA: ${r.tema}`,
+    `FORM: ${r.form}`,
+    `BOYUT: ${r.boyut}`,
+    `YERLEŞİM: ${r.yerlesim}`,
+    `HİS: ${r.his}`,
+    r.siir
+  ].join("\n");
+  document.getElementById("hidden-prompt").value = promptText;
+  showScreen("form");
 });
 
 document.querySelector('[data-action="to-form"]').addEventListener("click", () => {

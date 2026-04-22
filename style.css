@@ -264,6 +264,42 @@ h2 {
   resize: vertical;
 }
 
+/* Wheel */
+.wheel-container {
+  position: relative;
+  width: 300px;
+  margin: 0 auto;
+}
+
+.wheel-pointer {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--text);
+  font-size: 20px;
+  line-height: 1;
+  z-index: 2;
+  filter: drop-shadow(0 0 6px rgba(229,229,229,0.6));
+}
+
+#wheel-canvas {
+  display: block;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+}
+
+#wheel-result {
+  width: 100%;
+}
+
+.wheel-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
 /* Loader */
 .loader {
   width: 40px;

@@ -75,6 +75,49 @@
           <div class="result-poem" id="r-siir"></div>
         </div>
         <button class="btn primary" data-action="to-form">Bu benimle, devam et</button>
+        <button class="btn ghost" data-action="to-wheel">Çarkı çevir</button>
+      </div>
+    </section>
+
+    <!-- WHEEL -->
+    <section class="screen" id="screen-wheel">
+      <div class="content center">
+        <p class="label">Şansına bırak</p>
+        <div class="wheel-container">
+          <div class="wheel-pointer">▼</div>
+          <canvas id="wheel-canvas" width="300" height="300"></canvas>
+        </div>
+        <button class="btn primary" id="spin-btn">Çarkı Çevir</button>
+
+        <div id="wheel-result" hidden>
+          <div class="result-card">
+            <div class="result-row">
+              <span class="result-label">TEMA</span>
+              <span class="result-value" id="wr-tema"></span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">FORM</span>
+              <span class="result-value" id="wr-form"></span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">BOYUT</span>
+              <span class="result-value" id="wr-boyut"></span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">YERLEŞİM</span>
+              <span class="result-value" id="wr-yerlesim"></span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">HİS</span>
+              <span class="result-value" id="wr-his"></span>
+            </div>
+            <div class="result-poem" id="wr-siir"></div>
+          </div>
+          <div class="wheel-actions">
+            <button class="btn primary" data-action="wheel-to-form">Bu benimle, devam et</button>
+            <button class="btn ghost" id="respin-btn">Tekrar çevir</button>
+          </div>
+        </div>
       </div>
     </section>
 
