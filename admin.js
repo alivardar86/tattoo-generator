@@ -1,13 +1,11 @@
 /* ══════════════════════════════════════════════
-   SUPABASE CONFIG — index.html ile aynı değerler
+   SUPABASE CONFIG
 ══════════════════════════════════════════════ */
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
-
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL = 'https://uyjusadaakirelhuhgqr.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_MV17SMsY-3P8VlYsc5LBdQ_eWt-YkQT';
 
 /* ══════════════════════════════════════════════
-   SORU ETİKETLERİ (admin görünümü için)
+   ETİKETLER
 ══════════════════════════════════════════════ */
 const questionLabels = {
   soru1:      'Ne hatırlatmalı?',
@@ -29,6 +27,12 @@ const resultLabels = {
 };
 
 /* ══════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════ */
+let accessToken = localStorage.getItem('sb_access_token');
+let _submissions = [];
+
+/* ══════════════════════════════════════════════
    DOM
 ══════════════════════════════════════════════ */
 const loginView  = document.getElementById('login-view');
@@ -45,11 +49,8 @@ const modalTitle = document.getElementById('modal-title');
 const modalBody  = document.getElementById('modal-body');
 const modalClose = document.getElementById('modal-close');
 
-// Submission cache (modal için)
-let _submissions = [];
-
 /* ══════════════════════════════════════════════
-   YARDIMCI: HTML escape (XSS koruması)
+   YARDIMCILAR
 ══════════════════════════════════════════════ */
 function esc(str) {
   if (str == null) return '';
@@ -60,39 +61,73 @@ function esc(str) {
     .replace(/"/g, '&quot;');
 }
 
-function formatDate(isoStr) {
-  if (!isoStr) return '—';
-  return new Date(isoStr).toLocaleString('tr-TR', {
+function formatDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('tr-TR', {
     day: '2-digit', month: '2-digit', year: 'numeric',
     hour: '2-digit', minute: '2-digit'
   });
 }
 
-function isToday(isoStr) {
-  const d = new Date(isoStr);
-  const t = new Date();
-  return d.getDate() === t.getDate() &&
-         d.getMonth() === t.getMonth() &&
-         d.getFullYear() === t.getFullYear();
+function isToday(iso) {
+  const d = new Date(iso), t = new Date();
+  return d.toDateString() === t.toDateString();
+}
+
+/* ══════════════════════════════════════════════
+   SUPABASE REST API
+══════════════════════════════════════════════ */
+async function sbGet(path, token) {
+  const res = await fetch(`${SUPABASE_URL}${path}`, {
+    headers: {
+      'apikey':        SUPABASE_KEY,
+      'Authorization': `Bearer ${token}`
+    }
+  });
+  if (res.status === 401) { logout(); return null; }
+  return res.json();
+}
+
+async function sbLogin(email, password) {
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY
+    },
+    body: JSON.stringify({ email, password })
+  });
+  return res.json();
+}
+
+async function sbLogout(token) {
+  await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
+    method: 'POST',
+    headers: {
+      'apikey':        SUPABASE_KEY,
+      'Authorization': `Bearer ${token}`
+    }
+  });
 }
 
 /* ══════════════════════════════════════════════
    AUTH
 ══════════════════════════════════════════════ */
-async function init() {
-  const { data: { session } } = await sb.auth.getSession();
-  session ? showDash() : showLogin();
-}
-
 function showLogin() {
   loginView.style.display = 'flex';
   dashView.style.display  = 'none';
 }
 
-async function showDash() {
+function showDash() {
   loginView.style.display = 'none';
   dashView.style.display  = 'block';
-  await loadSubmissions();
+}
+
+function logout() {
+  if (accessToken) sbLogout(accessToken);
+  accessToken = null;
+  localStorage.removeItem('sb_access_token');
+  showLogin();
 }
 
 loginForm.addEventListener('submit', async (e) => {
@@ -101,75 +136,67 @@ loginForm.addEventListener('submit', async (e) => {
   loginBtn.disabled      = true;
   loginBtn.textContent   = 'Giriş yapılıyor...';
 
-  const { error } = await sb.auth.signInWithPassword({
-    email:    document.getElementById('login-email').value.trim(),
-    password: document.getElementById('login-password').value
-  });
+  const data = await sbLogin(
+    document.getElementById('login-email').value.trim(),
+    document.getElementById('login-password').value
+  );
 
-  if (error) {
+  if (data.access_token) {
+    accessToken = data.access_token;
+    localStorage.setItem('sb_access_token', accessToken);
+    showDash();
+    loadSubmissions();
+  } else {
     loginError.textContent = 'Email veya şifre hatalı.';
     loginBtn.disabled      = false;
     loginBtn.textContent   = 'Giriş Yap';
-  } else {
-    showDash();
   }
 });
 
-logoutBtn.addEventListener('click', async () => {
-  await sb.auth.signOut();
-  showLogin();
+logoutBtn.addEventListener('click', () => {
+  logout();
 });
 
 /* ══════════════════════════════════════════════
-   VERİ YÜKLEME
+   VERİ
 ══════════════════════════════════════════════ */
 async function loadSubmissions() {
   tbody.innerHTML = '<tr><td colspan="5" class="loading">Yükleniyor...</td></tr>';
 
-  const { data, error } = await sb
-    .from('submissions')
-    .select('*')
-    .order('created_at', { ascending: false });
+  const data = await sbGet(
+    '/rest/v1/submissions?order=created_at.desc&select=*',
+    accessToken
+  );
 
-  if (error) {
-    tbody.innerHTML = `<tr><td colspan="5" class="empty">Veriler yüklenemedi: ${esc(error.message)}</td></tr>`;
+  if (!data) return; // 401 → logout zaten çağrıldı
+
+  if (!Array.isArray(data)) {
+    tbody.innerHTML = `<tr><td colspan="5" class="empty">Veri yüklenemedi.</td></tr>`;
+    console.error('Supabase response:', data);
     return;
   }
 
-  _submissions = data || [];
-  renderStats(_submissions);
-  renderTable(_submissions);
+  _submissions = data;
+  renderStats(data);
+  renderTable(data);
 }
 
 /* ══════════════════════════════════════════════
    İSTATİSTİKLER
 ══════════════════════════════════════════════ */
 function renderStats(data) {
-  const total  = data.length;
-  const today  = data.filter(s => isToday(s.created_at)).length;
-  const quiz   = data.filter(s => s.source === 'quiz').length;
-  const wheel  = data.filter(s => s.source === 'wheel').length;
+  const total = data.length;
+  const today = data.filter(s => isToday(s.created_at)).length;
+  const quiz  = data.filter(s => s.source === 'quiz').length;
+  const wheel = data.filter(s => s.source === 'wheel').length;
 
-  headerSub.textContent = `${total} kayıt — son güncelleme: ${new Date().toLocaleTimeString('tr-TR')}`;
+  headerSub.textContent = `${total} kayıt — ${new Date().toLocaleTimeString('tr-TR')}`;
 
-  statsEl.innerHTML = `
-    <div class="stat">
-      <div class="stat-value">${total}</div>
-      <div class="stat-label">Toplam</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value">${today}</div>
-      <div class="stat-label">Bugün</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value">${quiz}</div>
-      <div class="stat-label">Quiz</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value">${wheel}</div>
-      <div class="stat-label">Çark</div>
-    </div>
-  `;
+  statsEl.innerHTML = ['Toplam|' + total, 'Bugün|' + today, 'Quiz|' + quiz, 'Çark|' + wheel]
+    .map(x => {
+      const [label, val] = x.split('|');
+      return `<div class="stat"><div class="stat-value">${val}</div><div class="stat-label">${label}</div></div>`;
+    }).join('');
 }
 
 /* ══════════════════════════════════════════════
@@ -197,13 +224,6 @@ function renderTable(data) {
     `;
   }).join('');
 
-  // Event delegation — tek listener, tüm detay butonları için
-  tbody.addEventListener('click', (e) => {
-    const btn = e.target.closest('.btn-detail');
-    if (btn) showModal(btn.dataset.id);
-  }, { once: true }); // once: her render'da yeniden bağlanmayı önle
-
-  // Birden fazla render olabileceği için tekrar bağla
   tbody.onclick = (e) => {
     const btn = e.target.closest('.btn-detail');
     if (btn) showModal(btn.dataset.id);
@@ -219,7 +239,6 @@ function showModal(id) {
 
   modalTitle.textContent = s.name;
 
-  // Kişi bilgileri
   let html = `
     <div class="detail-section">
       <div class="detail-section-title">Kişi Bilgileri</div>
@@ -250,7 +269,6 @@ function showModal(id) {
     </div>
   `;
 
-  // Dövme sonucu
   if (s.prompt_result) {
     const r = s.prompt_result;
     const rows = Object.entries(resultLabels)
@@ -262,7 +280,7 @@ function showModal(id) {
         </div>
       `).join('');
 
-    html += `
+    if (rows) html += `
       <div class="detail-section">
         <div class="detail-section-title">Dövme Sonucu</div>
         ${rows}
@@ -270,7 +288,6 @@ function showModal(id) {
     `;
   }
 
-  // Ham cevaplar
   if (s.answers && Object.keys(s.answers).length) {
     const rows = Object.entries(s.answers).map(([k, v]) => `
       <div class="detail-row">
@@ -308,4 +325,9 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal
 /* ══════════════════════════════════════════════
    BAŞLAT
 ══════════════════════════════════════════════ */
-init();
+if (accessToken) {
+  showDash();
+  loadSubmissions();
+} else {
+  showLogin();
+}
