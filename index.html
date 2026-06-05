@@ -403,9 +403,8 @@
       Bu bir yön, <strong>henüz son form değil.</strong><br>
       Seninmiş gibi hissettiriyorsa — benimle paylaş.
     </p>
-    <div class="btn-group">
+    <div class="btn-group" style="justify-content:center">
       <button class="btn primary" data-action="quiz-to-form">Can Levi'ye gönder</button>
-      <button class="btn ghost" data-action="to-wheel">Çarkı çevir</button>
     </div>
   </section>
 
@@ -797,9 +796,6 @@ document.querySelector('[data-action="start"]').addEventListener("click",()=>{
   renderQuestion(); showScreen("questions");
 });
 
-document.querySelector('[data-action="to-wheel"]').addEventListener("click",()=>{
-  showScreen("wheel"); drawWheel(wheelAngle,-1);
-});
 
 document.getElementById("spin-btn").addEventListener("click", spinWheel);
 
