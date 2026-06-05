@@ -320,6 +320,32 @@
     }
 
     /* ══════════════════════════════
+       QUESTION SUBTITLE & MULTI-SELECT
+    ══════════════════════════════ */
+    .q-subtitle {
+      font-size: 14px; font-style: italic; color: var(--cream-dim);
+      text-align: center; letter-spacing: .06em;
+      margin-top: -34px; margin-bottom: 34px;
+      display: none;
+    }
+    .option-wrapper {
+      display: flex; flex-direction: column;
+    }
+    .option-hint-input {
+      background: none; border: none;
+      border-bottom: 1px solid var(--cream-faint);
+      border-left: 2px solid var(--gold-dim);
+      color: var(--cream); font-family: var(--serif); font-size: 14px;
+      font-weight: 300; padding: 8px 14px; outline: none;
+      font-style: italic; letter-spacing: .04em;
+      transition: border-color .3s;
+    }
+    .option-hint-input:focus {
+      border-bottom-color: var(--gold); border-left-color: var(--gold);
+    }
+    .option-hint-input::placeholder { color: var(--cream-faint); }
+
+    /* ══════════════════════════════
        RESPONSIVE
     ══════════════════════════════ */
     @media (min-width: 480px) {
@@ -358,8 +384,9 @@
 
   <!-- 2. QUESTIONS -->
   <section class="screen" id="screen-questions">
-    <div class="q-label" id="q-label">01 — 06</div>
+    <div class="q-label" id="q-label">01 — 09</div>
     <h2 class="q-text" id="question-text"></h2>
+    <p class="q-subtitle" id="q-subtitle"></p>
     <div id="options"></div>
   </section>
 
@@ -379,12 +406,12 @@
         <span class="result-value" id="r-tema"></span>
       </div>
       <div class="result-row">
-        <span class="result-label">FORM</span>
-        <span class="result-value" id="r-form"></span>
-      </div>
-      <div class="result-row" id="r-stil-row">
         <span class="result-label">STİL</span>
         <span class="result-value" id="r-stil"></span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">RENK</span>
+        <span class="result-value" id="r-renk"></span>
       </div>
       <div class="result-row">
         <span class="result-label">BOYUT</span>
@@ -395,8 +422,8 @@
         <span class="result-value" id="r-yerlesim"></span>
       </div>
       <div class="result-row">
-        <span class="result-label">HİS</span>
-        <span class="result-value" id="r-his"></span>
+        <span class="result-label">FORM</span>
+        <span class="result-value" id="r-form"></span>
       </div>
       <div class="result-poem" id="r-siir"></div>
     </div>
@@ -504,64 +531,69 @@ const SUPABASE_KEY = 'sb_publishable_MV17SMsY-3P8VlYsc5LBdQ_eWt-YkQT';
    DATA — unchanged from original
 ══════════════════════════════════════════════ */
 const questions = [
-  { key:"soru1", text:"Bu dövme sana ne hatırlatmalı?", options:["Bir kişiyi","Bir dönemi","Bir kararı","Hiçbir şeyi — sadece güzel olsun"] },
-  { key:"soru_style", type:"visual", text:"Hangisi sana daha çok hitap ediyor?", options:[
-    { value:"fine-line",    label:"İnce",     img:"images/fineline.png",    alt:"Fine Line" },
-    { value:"blackwork",    label:"Dolgun",   img:"images/blackwork.png",   alt:"Blackwork" },
-    { value:"illustrative", label:"Çizimsel", img:"images/illustrative.png",alt:"Illustrative" },
-    { value:"geometric",    label:"Şekilsel", img:"images/geometric.png",   alt:"Geometric" }
-  ]},
-  { key:"soru2", text:"Vücudunda nereyi düşünüyorsun?", options:["Kol","Bacak","Sırt / Göğüs","Henüz bilmiyorum"] },
-  { key:"soru3", text:"Boyut olarak?", options:["Küçük, fark edilmesin","Orta, dengeli","Büyük, statement"] },
-  { key:"soru4", text:"Hangi his daha yakın?", options:["Keskin ve güçlü","Yumuşak ve akışkan","Kaotik ve serbest","Minimal ve sessiz"] },
-  { key:"soru5", text:"Bu dövme sana ne versin?", options:["Hatırlama","Cesaret","Huzur","Sadece estetik"] }
+  {
+    key: "soru1",
+    multiSelect: true,
+    text: "Haydi gel önce tasarımının temasını belirleyelim 🤗",
+    subtitle: "birden fazla seçenek işaretleyebilirsin ❤️",
+    options: [
+      { value: "Doğa",             hint: "Örn: deniz, güneş, kamp..." },
+      { value: "Hayvan",           hint: "Örn: aslan, kedi, kartal..." },
+      { value: "Mitoloji / Tarih" },
+      { value: "Soyut" },
+      { value: "Geometrik" },
+      { value: "Pop kültür" },
+      { value: "Karanlık / Gotik" }
+    ]
+  },
+  {
+    key: "soru2",
+    text: "Dövmen hangi duyguyu / enerjiyi taşısın?",
+    options: ["Zarif", "Gizem", "Huzurlu / spiritüel", "Melankolik", "Güçlü"]
+  },
+  {
+    key: "soru3",
+    text: "Renk sever misin?",
+    options: ["Sadece siyah olsun", "Siyah + gri tonlar", "Az renk olabilir (1-2 renk)", "Tam renkli olsun"]
+  },
+  {
+    key: "soru4",
+    text: "Aşağıdakilerden hangisine kendini daha yakın hissediyorsun?",
+    options: ["Fineline / Minimal", "Geometrik", "Dotwork", "Tribal", "Suluboya", "Japon", "Trash Polka", "Traditional", "Realistik"]
+  },
+  {
+    key: "soru5",
+    text: "Dövmeni nerede hayal ediyorsun?",
+    options: ["Üst kol", "Alt kol", "Omuz / Kürek Kemiği", "Göğüs / Kaburga", "Bacak / Ayak bileği", "El / Parmak"]
+  },
+  {
+    key: "soru6",
+    text: "Arka plan nasıl olsun?",
+    options: ["Arka plan olmasın", "Hafif dokulu olsun", "Detaylı arka planı olsun"]
+  },
+  {
+    key: "soru7",
+    text: "Ne büyüklükte istersin?",
+    options: ["Minnak (2-3cm)", "Ortalama bir şey olsun (5-8cm)", "Ben buradayım desin (10-15cm)", "Kolumu kaplasın 🙂"]
+  },
+  {
+    key: "soru8",
+    text: "Haydi formunu da seçelim 😀",
+    options: ["Uzunlamasına olsun (dikey)", "Yatay olsun", "Yuvarlak / oval bir şekli olsun", "Düzensiz, organik bir formu olsun"]
+  },
+  {
+    key: "soru9",
+    text: "Son olarak biraz seni tanıyabilir miyim? 🫶🏽",
+    options: ["İlk dövmem", "Birkaç tane var", "Çok dövmem var"]
+  }
 ];
 
-const styleMapping = {
-  "fine-line":"ince çizgiler, detaylı ve zarif",
-  "blackwork":"dolgun siyah alanlar, güçlü kontrastlar",
-  "illustrative":"çizimsel, hikaye anlatan",
-  "geometric":"geometrik formlar, keskin açılar"
-};
-
-const keyMap = {
-  soru1:{"Bir kişiyi":"kisiyi","Bir dönemi":"donemi","Bir kararı":"karari","Hiçbir şeyi — sadece güzel olsun":"estetik"},
-  soru3:{"Küçük, fark edilmesin":"kucuk","Orta, dengeli":"orta","Büyük, statement":"buyuk"},
-  soru4:{"Keskin ve güçlü":"keskin","Yumuşak ve akışkan":"yumusak","Kaotik ve serbest":"kaotik","Minimal ve sessiz":"minimal"}
-};
-
-function makeKey(s1,s3,s4){return `${keyMap.soru1[s1]}_${keyMap.soru3[s3]}_${keyMap.soru4[s4]}`;}
-
-const combinations = {
-  "kisiyi_kucuk_minimal":{tema:"Anı",form:"Tek çizgi, kesintisiz, neredeyse soyut",boyut:"2–4cm",yerlesim:"Bilek içi veya parmak yanı",his:"Sessiz sadakat",siir:"Birinin varlığını fısıldar gibi taşıyacak.\nGörünmez ama her zaman orada."},
-  "kisiyi_kucuk_keskin":{tema:"Özlem",form:"İnce, keskin hatlar — bir tarih ya da koordinat gibi",boyut:"2–4cm",yerlesim:"Boyun altı veya kaburga",his:"Derin, keskin",siir:"Uzaklık ölçülmez.\nAma bu iz her zaman yakın."},
-  "kisiyi_orta_yumusak":{tema:"Bağlılık",form:"Akışkan, organik bir form — belki bir siluet",boyut:"6–8cm",yerlesim:"Ön kol veya köprücük kemiği",his:"Sıcak, sakin",siir:"Sevgi her zaman söze ihtiyaç duymaz.\nBazen sadece ciltte bir şekil yeterlidir."},
-  "kisiyi_buyuk_yumusak":{tema:"Sevgi",form:"Geniş, sarmalayan formlar — yumuşak geçişler",boyut:"12–15cm",yerlesim:"Sırt veya göğüs",his:"Derin, kucaklayıcı",siir:"Bazı insanlar iz bırakmaz.\nSen iz bırakmalarına izin verdin. Bu güzel."},
-  "kisiyi_buyuk_kaotik":{tema:"Kayıp",form:"Dağınık, parçalı çizgiler — tamamlanmamış formlar",boyut:"15cm+",yerlesim:"Sırt veya uyluk",his:"Ağır, dürüst",siir:"Kayıp düzgün durmaz.\nBu çizgiler de durmuyor. İkisi de gerçek."},
-  "donemi_kucuk_minimal":{tema:"Geçiş",form:"Soyut bir nokta, virgül ya da yatay çizgi",boyut:"1–3cm",yerlesim:"Bilek veya parmak",his:"Hafif, nefes gibi",siir:"O dönem kapandı.\nBu küçük iz, kapıyı kapatan elin izi."},
-  "donemi_orta_keskin":{tema:"Kapanış",form:"Geometrik, köşeli hatlar — belki kırık bir şekil",boyut:"6–10cm",yerlesim:"Ön kol veya baldır",his:"Kararlı, net",siir:"O dönem bitti.\nBu iz, geride kalanın değil, ileriye bakışın sembolü."},
-  "donemi_orta_yumusak":{tema:"Dönüşüm",form:"Organik, akışkan çizgiler — bir şeyin başka bir şeye evrimi",boyut:"6–9cm",yerlesim:"Kol veya köprücük kemiği",his:"Huzurlu ama güçlü",siir:"Geçmişi değil, ondan öğrendiklerini taşıyacak bir iz.\nKüçük ama unutulmaz."},
-  "donemi_buyuk_kaotik":{tema:"Kırılma",form:"Serbest fırça darbeleri, düzensiz geometri",boyut:"15cm+",yerlesim:"Sırt veya uyluk",his:"Ham, dürüst",siir:"Bazı dönemler nazikçe bitmez.\nBu dövme o gerçeği gizlemiyor."},
-  "donemi_buyuk_keskin":{tema:"Son",form:"Keskin, net geometri — bir kapı ya da çerçeve",boyut:"12–18cm",yerlesim:"Sırt ortası veya göğüs",his:"Ağır, kalıcı",siir:"Her son bir başlangıca zemin hazırlar.\nBu iz o zemini işaret ediyor."},
-  "karari_kucuk_minimal":{tema:"Odak",form:"Tek bir sembol, geometrik ve yalın",boyut:"2–3cm",yerlesim:"Bilek içi veya parmak",his:"Sessiz, güçlü",siir:"Büyük kararlar küçük anlarda alınır.\nBu iz o anı tutuyor."},
-  "karari_orta_keskin":{tema:"Kararlılık",form:"Keskin, belirgin hatlar — hiçbir belirsizlik yok",boyut:"6–10cm",yerlesim:"Ön kol veya baldır",his:"Net, güçlü",siir:"Bu karar kolay olmadı.\nAma doğruydu. Her baktığında hatırlayacaksın."},
-  "karari_orta_yumusak":{tema:"Denge",form:"Akışkan ama yapılandırılmış — yin-yang enerjisi",boyut:"6–8cm",yerlesim:"Kol veya göğüs",his:"Huzurlu, kararlı",siir:"Zor kararlar bazen en yumuşak yerlere yerleşir.\nOrası senin kararın için doğru yer."},
-  "karari_buyuk_keskin":{tema:"İrade",form:"Güçlü, simetrik geometri — bir ok ya da yapı",boyut:"12–18cm",yerlesim:"Sırt veya göğüs",his:"Baskın, kalıcı",siir:"Herkes karar verir.\nAz kişi kararının üstünde durur. Sen duruyorsun."},
-  "karari_buyuk_kaotik":{tema:"İsyan",form:"Dağınık, agresif çizgiler — kural tanımayan bir enerji",boyut:"15cm+",yerlesim:"Sırt, göğüs veya uyluk",his:"Yoğun, özgür",siir:"Bu karar sistemin onayladığı türden değildi.\nVe bu onu daha gerçek yapıyor."},
-  "estetik_kucuk_minimal":{tema:"Sadelik",form:"Tek bir çizgi, yalın ve mükemmel",boyut:"1–3cm",yerlesim:"Parmak, bilek ya da kulak arkası",his:"Dingin, zarif",siir:"Anlam aramıyorsun.\nSadece güzel bir şey istiyorsun. Bu da bir cesaret."},
-  "estetik_orta_keskin":{tema:"Güç",form:"Keskin, net formlar — saf estetik enerji",boyut:"6–10cm",yerlesim:"Kol veya bacak",his:"Etkileyici, özgüvenli",siir:"Güzellik kendi başına bir mesaj taşır.\nVe bu mesaj yeterince güçlü."},
-  "estetik_orta_yumusak":{tema:"Ritim",form:"Yumuşak, tekrarlayan formlar — neredeyse müzikal",boyut:"7–10cm",yerlesim:"Kol, omuz veya böğür",his:"Akışkan, estetik",siir:"Güzellik bazen bir ritimdir.\nSen o ritmi taşımak istiyorsun."},
-  "estetik_buyuk_yumusak":{tema:"Akış",form:"Geniş, serbest akışkan formlar — soyut ve zarif",boyut:"15cm+",yerlesim:"Sırt veya uyluk",his:"Özgür, etkileyici",siir:"Bu dövme bir şey söylemek zorunda değil.\nSadece var olması yeterli."},
-  "estetik_buyuk_kaotik":{tema:"Özgürlük",form:"Serbest fırça darbeleri, kontrolsüz enerji",boyut:"15cm+",yerlesim:"Sırt, göğüs veya uyluk",his:"Taşkın, enerjik",siir:"Anlam aramıyorsun.\nSadece var olmak istiyorsun. Bu da bir anlam aslında."}
-};
-
-const fallback = {
-  tema:{"Bir kişiyi":"Bağ","Bir dönemi":"Dönüşüm","Bir kararı":"İrade","Hiçbir şeyi — sadece güzel olsun":"Form"},
-  form:{"Keskin ve güçlü":"Keskin hatlar, güçlü kontrastlar","Yumuşak ve akışkan":"Yumuşak geçişler, akışkan formlar","Kaotik ve serbest":"Serbest çizgiler, kontrolsüz enerji","Minimal ve sessiz":"Minimal, neredeyse fısıltı gibi"},
-  boyut:{"Küçük, fark edilmesin":"2–4cm, gizli bir işaret","Orta, dengeli":"6–10cm, dengeli bir alan","Büyük, statement":"15cm+, geniş bir ifade"},
-  yerlesim:{"Kol":"Kol iç yüzeyi veya ön kol","Bacak":"Baldır veya bacak hattı","Sırt / Göğüs":"Sırt ortası veya göğüs","Henüz bilmiyorum":"Esnek — birlikte karar veririz"},
-  his:{"Hatırlama":"Sakin, içe dönük","Cesaret":"Güçlü, kararlı","Huzur":"Yumuşak, dengeleyici","Sadece estetik":"Özgür, sınırsız"},
-  siir:{"Bir kişiyi":"Bazı izler görünmez ama her zaman hissedilir.\nBu da böyle olacak.","Bir dönemi":"Her dönem bir şey öğretir.\nBu dövme o öğretinin kalıcı izi.","Bir kararı":"Kararlar bazen sessiz, bazen gürültülü gelir.\nBu, seninki.","Hiçbir şeyi — sadece güzel olsun":"Bazen güzellik kendi başına yeterlidir.\nVe bu yeterlilik bir güçtür."}
+const duyguSiir = {
+  "Zarif":               "Zarif olan her şey, göründüğünden daha güçlüdür.\nBu çizgi de öyle olacak.",
+  "Gizem":               "Her bakışta yeni bir şey keşfedeceksin.\nBir sır gibi — sadece senin bildiğin.",
+  "Huzurlu / spiritüel": "Bazen bir iz yeterlidir ruhu dinginleştirmeye.\nBu da o iz olacak.",
+  "Melankolik":          "Güzellik ve hüzün birbirinden ayrılmaz.\nBu dövme ikisini de taşıyacak.",
+  "Güçlü":               "Güç sessiz olmak zorunda değil.\nBu çizgi seninle konuşacak."
 };
 
 const wheelItems = [
@@ -632,29 +664,77 @@ function renderQuestion(){
   const q = questions[state.currentQuestion];
   document.getElementById("q-label").textContent = `${pad(state.currentQuestion+1)} — ${pad(TOTAL_Q)}`;
   document.getElementById("question-text").textContent = q.text;
+
+  const subtitleEl = document.getElementById("q-subtitle");
+  subtitleEl.textContent = q.subtitle || "";
+  subtitleEl.style.display = q.subtitle ? "" : "none";
+
   backBtn.style.display = state.currentQuestion > 0 ? "block" : "none";
 
   const optEl = document.getElementById("options");
   optEl.innerHTML = "";
+  optEl.className = "options";
 
-  if(q.type === "visual"){
-    const grid = document.createElement("div");
-    grid.className = "visual-options";
+  if (q.multiSelect) {
+    const selected = new Set();
+    const extraInputs = {};
+
+    const continueBtn = document.createElement("button");
+    continueBtn.className = "btn primary";
+    continueBtn.style.cssText = "margin-top:16px; display:none;";
+    continueBtn.textContent = "Devam et";
+    continueBtn.type = "button";
+
     q.options.forEach(opt => {
-      const card = document.createElement("div");
-      card.className = "visual-card";
-      card.dataset.value = opt.value;
-      card.innerHTML = `<img src="${opt.img}" alt="${opt.alt}" loading="lazy"><span>${opt.label}</span>`;
-      card.addEventListener("click", () => {
-        document.querySelectorAll(".visual-card").forEach(c => c.classList.remove("selected"));
-        card.classList.add("selected");
-        setTimeout(() => selectOption(opt.value), 320);
+      const value = typeof opt === "object" ? opt.value : opt;
+      const hint  = typeof opt === "object" ? opt.hint  : null;
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "option-wrapper";
+
+      const btn = document.createElement("button");
+      btn.className = "option";
+      btn.textContent = value;
+      btn.type = "button";
+      wrapper.appendChild(btn);
+
+      if (hint) {
+        const inp = document.createElement("input");
+        inp.type = "text";
+        inp.className = "option-hint-input";
+        inp.placeholder = hint;
+        inp.style.display = "none";
+        extraInputs[value] = inp;
+        wrapper.appendChild(inp);
+      }
+
+      btn.addEventListener("click", () => {
+        if (selected.has(value)) {
+          selected.delete(value);
+          btn.classList.remove("selected");
+          if (extraInputs[value]) extraInputs[value].style.display = "none";
+        } else {
+          selected.add(value);
+          btn.classList.add("selected");
+          if (extraInputs[value]) extraInputs[value].style.display = "";
+        }
+        continueBtn.style.display = selected.size > 0 ? "" : "none";
       });
-      grid.appendChild(card);
+
+      optEl.appendChild(wrapper);
     });
-    optEl.appendChild(grid);
+
+    continueBtn.addEventListener("click", () => {
+      const result = [];
+      selected.forEach(v => {
+        const extra = extraInputs[v] ? extraInputs[v].value.trim() : "";
+        result.push(extra ? `${v}: ${extra}` : v);
+      });
+      selectOption(result);
+    });
+    optEl.appendChild(continueBtn);
+
   } else {
-    optEl.className = "options";
     q.options.forEach(opt => {
       const btn = document.createElement("button");
       btn.className = "option";
@@ -686,26 +766,27 @@ function selectOption(value){
 ══════════════════════════════════════════════ */
 function buildResult(){
   const a = state.answers;
-  const key = makeKey(a.soru1, a.soru3, a.soru4);
-  state.quizResult = combinations[key] ? {...combinations[key]} : {
-    tema:fallback.tema[a.soru1], form:fallback.form[a.soru4],
-    boyut:fallback.boyut[a.soru3], yerlesim:fallback.yerlesim[a.soru2],
-    his:fallback.his[a.soru5], siir:fallback.siir[a.soru1]
+  const tema = Array.isArray(a.soru1) ? a.soru1.join(", ") : (a.soru1 || "");
+  state.quizResult = {
+    tema,
+    stil:     a.soru4 || "",
+    renk:     a.soru3 || "",
+    boyut:    a.soru7 || "",
+    yerlesim: a.soru5 || "",
+    form:     a.soru8 || "",
+    siir:     duyguSiir[a.soru2] || ""
   };
-  state.quizResult.stil = styleMapping[a.soru_style] || null;
 }
 
 function renderResult(){
   const r = state.quizResult;
-  document.getElementById("r-tema").textContent = r.tema;
-  document.getElementById("r-form").textContent = r.form;
-  document.getElementById("r-boyut").textContent = r.boyut;
+  document.getElementById("r-tema").textContent     = r.tema;
+  document.getElementById("r-stil").textContent     = r.stil;
+  document.getElementById("r-renk").textContent     = r.renk;
+  document.getElementById("r-boyut").textContent    = r.boyut;
   document.getElementById("r-yerlesim").textContent = r.yerlesim;
-  document.getElementById("r-his").textContent = r.his;
-  document.getElementById("r-siir").textContent = `"${r.siir}"`;
-  const stilRow = document.getElementById("r-stil-row");
-  if(r.stil){ document.getElementById("r-stil").textContent = r.stil; stilRow.style.display=""; }
-  else { stilRow.style.display="none"; }
+  document.getElementById("r-form").textContent     = r.form;
+  document.getElementById("r-siir").textContent     = r.siir ? `"${r.siir}"` : "";
 }
 
 /* ══════════════════════════════════════════════
@@ -781,12 +862,18 @@ function showWheelResult(index){
    HELPERS
 ══════════════════════════════════════════════ */
 function resultToPrompt(r){
+  const a = state.answers;
   return [
-    `TEMA: ${r.tema}`, `FORM: ${r.form}`,
-    r.stil ? `STİL: ${r.stil}` : null,
-    `BOYUT: ${r.boyut}`, `YERLEŞİM: ${r.yerlesim}`,
-    `HİS: ${r.his}`, r.siir
-  ].filter(Boolean).join("\n");
+    `TEMA: ${r.tema}`,
+    `STİL: ${r.stil}`,
+    `RENK: ${r.renk}`,
+    `BOYUT: ${r.boyut}`,
+    `YERLEŞİM: ${r.yerlesim}`,
+    `ARKA PLAN: ${a.soru6 || ""}`,
+    `FORM: ${r.form}`,
+    `DUYGU: ${a.soru2 || ""}`,
+    `DENEYİM: ${a.soru9 || ""}`
+  ].filter(l => !l.endsWith(": ")).join("\n");
 }
 
 /* ══════════════════════════════════════════════
