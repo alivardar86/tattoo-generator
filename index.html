@@ -6,7 +6,7 @@
   <title>CAN LEVI</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
   <style>
     /* ── Reset ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -18,7 +18,7 @@
       --cream-faint:rgba(237,232,223,0.14);
       --gold:       #c9b89a;
       --gold-dim:   rgba(201,184,154,0.30);
-      --serif:      'Cormorant Garamond', Georgia, serif;
+      --serif:      'Jost', 'Futura', 'Trebuchet MS', sans-serif;
       --dur:        0.75s;
     }
 
@@ -726,7 +726,7 @@ function drawWheel(rotation, highlightIndex){
     ctx.strokeStyle="#1a1a1a"; ctx.lineWidth=1.5; ctx.stroke();
     ctx.save(); ctx.translate(cx,cy); ctx.rotate(sa+arc/2); ctx.textAlign="right";
     ctx.fillStyle = hi ? "#ede8df" : "rgba(237,232,223,0.5)";
-    ctx.font = `${hi?"400 ":"300 "}11px 'Cormorant Garamond', serif`;
+    ctx.font = `${hi?"400 ":"300 "}11px 'Jost', sans-serif`;
     ctx.fillText(wheelItems[i].tema, r-14, 4); ctx.restore();
   }
   ctx.beginPath(); ctx.arc(cx,cy,r,0,2*Math.PI);
