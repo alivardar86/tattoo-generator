@@ -228,7 +228,13 @@
     .loading-logo {
       width: clamp(110px, 30vw, 170px);
       display: block;
-      margin: 0 auto 36px;
+      margin: 0 auto 28px;
+      transform-origin: center;
+      animation: breathe 2.8s ease-in-out infinite alternate;
+    }
+    .loading-label {
+      font-size: 11px; letter-spacing: .35em; text-transform: uppercase;
+      color: var(--cream); text-align: center;
       transform-origin: center;
       animation: breathe 2.8s ease-in-out infinite alternate;
     }
@@ -479,6 +485,7 @@
   <!-- 3. LOADING -->
   <section class="screen" id="screen-loading">
     <img class="loading-logo" src="images/logo.png" alt="" aria-hidden="true">
+    <p class="loading-label">Başlıyorum</p>
   </section>
 
   <!-- 5. WHEEL -->
