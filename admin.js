@@ -8,18 +8,22 @@ const SUPABASE_KEY = 'sb_publishable_MV17SMsY-3P8VlYsc5LBdQ_eWt-YkQT';
    ETİKETLER
 ══════════════════════════════════════════════ */
 const questionLabels = {
-  soru1:      'Ne hatırlatmalı?',
-  soru_style: 'Stil tercihi',
-  soru2:      'Vücut bölgesi',
-  soru3:      'Boyut',
-  soru4:      'His',
-  soru5:      'Ne versin?'
+  soru1: 'Tema',
+  soru2: 'Duygu / Enerji',
+  soru3: 'Renk',
+  soru4: 'Stil',
+  soru5: 'Yerleşim',
+  soru6: 'Arka Plan',
+  soru7: 'Boyut',
+  soru8: 'Form',
+  soru9: 'Deneyim'
 };
 
 const resultLabels = {
   tema:     'TEMA',
-  form:     'FORM',
   stil:     'STİL',
+  renk:     'RENK',
+  form:     'FORM',
   boyut:    'BOYUT',
   yerlesim: 'YERLEŞİM',
   his:      'HİS',

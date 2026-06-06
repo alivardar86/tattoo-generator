@@ -110,6 +110,10 @@
       width: 1px; height: 56px; margin: 0 auto 24px;
       background: linear-gradient(to bottom, transparent, var(--gold-dim), transparent);
     }
+    .landing-name {
+      font-size: 13px; letter-spacing: .38em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 24px;
+    }
     .landing-tagline {
       font-size: clamp(15px,2.4vw,20px); font-style: italic;
       color: var(--cream-dim); text-align: center;
@@ -297,7 +301,7 @@
     }
     #lead-form input:focus, #lead-form textarea:focus { border-bottom-color: var(--gold); }
     #lead-form input::placeholder, #lead-form textarea::placeholder {
-      color: var(--cream-faint); font-style: italic;
+      color: rgba(237,232,223,0.5); font-style: italic;
     }
     #lead-form input:-webkit-autofill,
     #lead-form input:-webkit-autofill:focus {
@@ -343,7 +347,7 @@
     .option-hint-input:focus {
       border-bottom-color: var(--gold); border-left-color: var(--gold);
     }
-    .option-hint-input::placeholder { color: var(--cream-faint); }
+    .option-hint-input::placeholder { color: var(--cream-dim); }
 
     /* ══════════════════════════════
        RESPONSIVE
@@ -377,8 +381,8 @@
   <section class="screen active" id="screen-landing">
     <div class="landing-eyebrow">İstanbul — Dövme Sanatçısı</div>
     <img class="landing-logo" src="images/logo.png" alt="Studio C Tattoo Parlor" />
-    <div class="v-rule-long"></div>
-    <p class="landing-tagline">Senin hikâyenden bir çizgi.</p>
+    <div class="landing-name">CAN LEVİ</div>
+    <p class="landing-tagline">Hoş geldin! Bence her dövme, sana ait bir hikayeyi anlatır. Bu siteyi, senin o eşsiz hikayene bir başlangıç noktası olmak için kurduk. Birkaç soruya vereceğin kısa cevaplarla, yapay zeka senin için, tamamen sana özel tasarım yapacak. Amacım sana birebir aynısını yaptıracağın statik bir görsel vermek değil; hayalindeki o dövme için ilham olacak, kafandaki fikirleri somutlaştıracak bir ilk adım sunmak. Kendi Hikayeni Çizmeye Buradan Başla ✨</p>
     <button class="enter-btn" data-action="start">Başla</button>
   </section>
 
@@ -395,45 +399,6 @@
     <p class="loading-text">
       Senin çizgini buluyorum<span class="dots"><span>.</span><span>.</span><span>.</span></span>
     </p>
-  </section>
-
-  <!-- 4. QUIZ RESULT -->
-  <section class="screen" id="screen-quiz-result">
-    <div class="oracle-eyebrow">Senin Çizgin</div>
-    <div class="result-card">
-      <div class="result-row">
-        <span class="result-label">TEMA</span>
-        <span class="result-value" id="r-tema"></span>
-      </div>
-      <div class="result-row">
-        <span class="result-label">STİL</span>
-        <span class="result-value" id="r-stil"></span>
-      </div>
-      <div class="result-row">
-        <span class="result-label">RENK</span>
-        <span class="result-value" id="r-renk"></span>
-      </div>
-      <div class="result-row">
-        <span class="result-label">BOYUT</span>
-        <span class="result-value" id="r-boyut"></span>
-      </div>
-      <div class="result-row">
-        <span class="result-label">YERLEŞİM</span>
-        <span class="result-value" id="r-yerlesim"></span>
-      </div>
-      <div class="result-row">
-        <span class="result-label">FORM</span>
-        <span class="result-value" id="r-form"></span>
-      </div>
-      <div class="result-poem" id="r-siir"></div>
-    </div>
-    <p class="oracle-note">
-      Bu bir yön, <strong>henüz son form değil.</strong><br>
-      Seninmiş gibi hissettiriyorsa — benimle paylaş.
-    </p>
-    <div class="btn-group" style="justify-content:center">
-      <button class="btn primary" data-action="quiz-to-form">Can Levi'ye gönder</button>
-    </div>
   </section>
 
   <!-- 5. WHEEL -->
@@ -558,8 +523,19 @@ const questions = [
   },
   {
     key: "soru4",
+    type: "visual",
     text: "Aşağıdakilerden hangisine kendini daha yakın hissediyorsun?",
-    options: ["Fineline / Minimal", "Geometrik", "Dotwork", "Tribal", "Suluboya", "Japon", "Trash Polka", "Traditional", "Realistik"]
+    options: [
+      { value: "Fine Line",   label: "Fine Line",   img: "images/style-fineline.jpg",      alt: "Fine Line" },
+      { value: "Geometrik",   label: "Geometrik",   img: "images/style-geometrik.png",     alt: "Geometrik" },
+      { value: "Dotwork",     label: "Dotwork",     img: "images/style-dotwork.png",       alt: "Dotwork" },
+      { value: "Tribal",      label: "Tribal",      img: "images/style-tribal.jpg",        alt: "Tribal" },
+      { value: "Suluboya",    label: "Suluboya",    img: "images/style-suluboya.jpg",      alt: "Suluboya" },
+      { value: "Japon",       label: "Japon",       img: "images/style-japon.jpg",         alt: "Japon" },
+      { value: "Trash Polka", label: "Trash Polka", img: "images/style-trash-polka.jpg",   alt: "Trash Polka" },
+      { value: "Traditional", label: "Traditional", img: "images/style-traditional.jpg",   alt: "Traditional" },
+      { value: "Realistik",   label: "Realistik",   img: "images/style-realistik.jpg",     alt: "Realistik" }
+    ]
   },
   {
     key: "soru5",
@@ -621,7 +597,6 @@ const screens = {
   landing:     document.getElementById("screen-landing"),
   questions:   document.getElementById("screen-questions"),
   loading:     document.getElementById("screen-loading"),
-  quizResult:  document.getElementById("screen-quiz-result"),
   wheel:       document.getElementById("screen-wheel"),
   wheelResult: document.getElementById("screen-wheel-result"),
   form:        document.getElementById("screen-form"),
@@ -649,7 +624,7 @@ function showScreen(name){
   // progress
   const pctMap = {
     landing:0, questions: ((state.currentQuestion+1)/TOTAL_Q)*60,
-    loading:72, quizResult:85, wheelResult:85,
+    loading:72, wheelResult:85,
     wheel:65, form:92, done:100
   };
   setProgress(pctMap[name] ?? 0);
@@ -675,7 +650,23 @@ function renderQuestion(){
   optEl.innerHTML = "";
   optEl.className = "options";
 
-  if (q.multiSelect) {
+  if (q.type === "visual") {
+    const grid = document.createElement("div");
+    grid.className = "visual-options";
+    grid.style.gridTemplateColumns = "repeat(3,1fr)";
+    q.options.forEach(opt => {
+      const card = document.createElement("div");
+      card.className = "visual-card";
+      card.innerHTML = `<img src="${opt.img}" alt="${opt.alt}" loading="lazy"><span>${opt.label}</span>`;
+      card.addEventListener("click", () => {
+        grid.querySelectorAll(".visual-card").forEach(c => c.classList.remove("selected"));
+        card.classList.add("selected");
+        setTimeout(() => selectOption(opt.value), 280);
+      });
+      grid.appendChild(card);
+    });
+    optEl.appendChild(grid);
+  } else if (q.multiSelect) {
     const selected = new Set();
     const extraInputs = {};
 
@@ -756,8 +747,12 @@ function selectOption(value){
     stepCounter.textContent = `${pad(state.currentQuestion+1)} — ${pad(TOTAL_Q)}`;
   } else {
     buildResult();
+    state.source = 'quiz';
     showScreen("loading");
-    setTimeout(() => { renderResult(); showScreen("quizResult"); }, 2400);
+    setTimeout(() => {
+      document.getElementById("hidden-prompt").value = resultToPrompt(state.quizResult);
+      showScreen("form");
+    }, 2400);
   }
 }
 
@@ -891,7 +886,7 @@ document.querySelector('[data-action="respin"]').addEventListener("click",()=>{
   showScreen("wheel"); drawWheel(wheelAngle,-1); spinWheel();
 });
 
-document.querySelector('[data-action="quiz-to-form"]').addEventListener("click",()=>{
+document.querySelector('[data-action="quiz-to-form"]')?.addEventListener("click",()=>{
   state.source = 'quiz';
   document.getElementById("hidden-prompt").value = resultToPrompt(state.quizResult);
   showScreen("form");
@@ -905,7 +900,10 @@ document.querySelector('[data-action="wheel-to-form"]').addEventListener("click"
 
 backBtn.addEventListener("click",()=>{
   if(document.getElementById("screen-form").classList.contains("active")){
-    showScreen("quizResult"); return;
+    state.currentQuestion = questions.length - 1;
+    renderQuestion();
+    showScreen("questions");
+    return;
   }
   if(state.currentQuestion > 0){
     state.currentQuestion--;
