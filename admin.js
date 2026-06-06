@@ -35,6 +35,7 @@ const resultLabels = {
 ══════════════════════════════════════════════ */
 let accessToken = localStorage.getItem('sb_access_token');
 let _submissions = [];
+let _currentCopyText = '';
 
 /* ══════════════════════════════════════════════
    DOM
@@ -243,6 +244,44 @@ function showModal(id) {
 
   modalTitle.textContent = s.name;
 
+  /* ── Kopyalanacak düz metin oluştur ── */
+  const copyLines = [];
+  copyLines.push(`İsim: ${s.name || ''}`);
+  copyLines.push(`Email: ${s.email || ''}`);
+  copyLines.push(`Tarih: ${formatDate(s.created_at)}`);
+  copyLines.push(`Kaynak: ${s.source === 'wheel' ? 'Çark' : 'Quiz'}`);
+  if (s.note) copyLines.push(`Not: ${s.note}`);
+
+  if (s.prompt_result) {
+    const r = s.prompt_result;
+    const hasResult = Object.entries(resultLabels).some(([k]) => r[k]);
+    if (hasResult) {
+      copyLines.push('');
+      copyLines.push('--- Dövme Sonucu ---');
+      Object.entries(resultLabels).forEach(([k, label]) => {
+        if (r[k]) copyLines.push(`${label}: ${r[k]}`);
+      });
+    }
+  }
+
+  if (s.answers && Object.keys(s.answers).length) {
+    copyLines.push('');
+    copyLines.push('--- Kullanıcı Cevapları ---');
+    Object.entries(s.answers).forEach(([k, v]) => {
+      const label = questionLabels[k] || k;
+      const val   = Array.isArray(v) ? v.join(', ') : String(v ?? '');
+      copyLines.push(`${label}: ${val}`);
+    });
+  }
+
+  _currentCopyText = copyLines.join('\n');
+
+  /* Kopyala butonunu sıfırla */
+  const copyAllBtn = document.getElementById('btn-copy-all');
+  copyAllBtn.textContent = 'Kopyala';
+  copyAllBtn.classList.remove('copied');
+
+  /* ── HTML içeriği ── */
   let html = `
     <div class="detail-section">
       <div class="detail-section-title">Kişi Bilgileri</div>
@@ -293,12 +332,15 @@ function showModal(id) {
   }
 
   if (s.answers && Object.keys(s.answers).length) {
-    const rows = Object.entries(s.answers).map(([k, v]) => `
-      <div class="detail-row">
-        <span class="detail-key">${esc(questionLabels[k] || k)}</span>
-        <span class="detail-val">${esc(v)}</span>
-      </div>
-    `).join('');
+    const rows = Object.entries(s.answers).map(([k, v]) => {
+      const val = Array.isArray(v) ? v.join(', ') : esc(String(v ?? ''));
+      return `
+        <div class="detail-row">
+          <span class="detail-key">${esc(questionLabels[k] || k)}</span>
+          <span class="detail-val">${val}</span>
+        </div>
+      `;
+    }).join('');
 
     html += `
       <div class="detail-section">
@@ -322,6 +364,19 @@ function copyText(text) {
   navigator.clipboard.writeText(text).catch(() => {});
 }
 
+function copyAllText() {
+  navigator.clipboard.writeText(_currentCopyText).then(() => {
+    const btn = document.getElementById('btn-copy-all');
+    btn.textContent = 'Kopyalandı ✓';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Kopyala';
+      btn.classList.remove('copied');
+    }, 2200);
+  }).catch(() => {});
+}
+
+document.getElementById('btn-copy-all').addEventListener('click', copyAllText);
 modalClose.addEventListener('click', closeModal);
 modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });

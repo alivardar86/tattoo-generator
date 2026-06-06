@@ -68,7 +68,7 @@
     #app {
       min-height: 100vh;
       display: flex; align-items: center; justify-content: center;
-      padding: 80px 24px 60px;
+      padding: clamp(20px, 4vh, 48px) 24px;
     }
 
     .screen {
@@ -98,22 +98,38 @@
     ══════════════════════════════ */
     .landing-eyebrow {
       font-size: 10px; letter-spacing: .38em; text-transform: uppercase;
-      color: var(--gold); margin-bottom: 28px;
+      color: var(--gold); margin-bottom: 12px;
     }
+    /* [1] mix-blend-mode: screen kaldırıldı — transparan logo için */
     .landing-logo {
-      width: clamp(200px, 50vw, 320px);
-      mix-blend-mode: screen;
-      margin-bottom: 8px;
+      width: clamp(140px, 35vw, 220px);
+      margin-bottom: 16px;
       display: block;
     }
     .v-rule-long {
       width: 1px; height: 56px; margin: 0 auto 24px;
       background: linear-gradient(to bottom, transparent, var(--gold-dim), transparent);
     }
-    .landing-name {
-      font-size: 13px; letter-spacing: .38em; text-transform: uppercase;
-      color: var(--gold); margin-bottom: 24px;
+
+    /* [2] Yeni landing alıntı bloğu */
+    .landing-quote {
+      color: var(--gold);
+      font-size: clamp(12px, 1.8vw, 14px);
+      font-style: italic;
+      text-align: center;
+      line-height: 1.65;
+      margin-bottom: 20px;
+      max-width: 460px;
     }
+    .landing-quote p + p { margin-top: 5px; }
+    .landing-signature {
+      margin-top: 10px;
+      font-size: 13px;
+      letter-spacing: .12em;
+      font-style: italic;
+      color: var(--gold);
+    }
+
     .landing-tagline {
       font-size: clamp(15px,2.4vw,20px); font-style: italic;
       color: var(--cream-dim); text-align: center;
@@ -146,16 +162,35 @@
       text-align: center; line-height: 1.25; margin-bottom: 48px;
     }
 
-    /* text options */
+    /* text options — liste düzeni (multiSelect için) */
     .options {
       display: flex; flex-direction: column; gap: 8px; width: 100%;
     }
+
+    /* Flex-wrap düzeni — normal sorular için (içeriğe göre genişlik) */
+    .options-grid {
+      display: flex;
+      flex-direction: row;   /* sütun değil, satır — auto-width için şart */
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+    }
+    .options-grid > .btn {
+      width: 100%;
+      flex-basis: 100%;
+    }
+
     .option {
       background: none; border: 1px solid var(--cream-faint);
-      color: var(--cream-dim); font-family: var(--serif); font-size: 16px;
-      font-weight: 300; padding: 14px 24px; text-align: left; cursor: pointer;
+      color: var(--cream-dim); font-family: var(--serif); font-size: 15px;
+      font-weight: 300; padding: 14px 20px; text-align: center; cursor: pointer;
       transition: all .3s; border-radius: 0; letter-spacing: .04em;
+      /* İçeriğe göre genişlik — sabit width yok */
+      width: auto; flex: 0 1 auto;
+      outline: none;
     }
+    .option:focus-visible { outline: 1px solid var(--gold-dim); }
     .option:hover { border-color: var(--gold-dim); color: var(--cream); }
     .option.selected { border-color: var(--gold); color: var(--cream); background: rgba(201,184,154,.06); }
 
@@ -175,12 +210,8 @@
       display: block; filter: grayscale(20%); transition: filter .35s;
     }
     .visual-card:hover img, .visual-card.selected img { filter: grayscale(0%); }
-    .visual-card span {
-      display: block; text-align: center; padding: 10px 8px;
-      font-size: 13px; font-weight: 300; color: var(--cream-dim);
-      letter-spacing: .1em; transition: color .3s;
-    }
-    .visual-card:hover span, .visual-card.selected span { color: var(--cream); }
+    /* [10] Görsel kart başlıkları gizlendi */
+    .visual-card span { display: none; }
 
     /* ══════════════════════════════
        LOADING
@@ -244,6 +275,7 @@
       text-transform: uppercase; padding: 15px 32px; cursor: pointer;
       transition: all .35s; text-decoration: none; text-align: center;
       border-radius: 0; font-weight: 300; display: block; width: 100%;
+      outline: none;
     }
     .btn.primary {
       background: none; border: 1px solid var(--gold); color: var(--cream);
@@ -335,19 +367,36 @@
     .option-wrapper {
       display: flex; flex-direction: column;
     }
+    /* [5] Hint input opaklık artırıldı: font-weight 400, italic kaldırıldı */
     .option-hint-input {
       background: none; border: none;
       border-bottom: 1px solid var(--cream-faint);
       border-left: 2px solid var(--gold-dim);
       color: var(--cream); font-family: var(--serif); font-size: 14px;
-      font-weight: 300; padding: 8px 14px; outline: none;
-      font-style: italic; letter-spacing: .04em;
+      font-weight: 400; padding: 8px 14px; outline: none;
+      letter-spacing: .04em;
       transition: border-color .3s;
     }
     .option-hint-input:focus {
       border-bottom-color: var(--gold); border-left-color: var(--gold);
     }
-    .option-hint-input::placeholder { color: var(--cream-dim); }
+    /* [4] Placeholder metni JS'den ayarlanıyor, ama rengi burada */
+    .option-hint-input::placeholder { color: rgba(237,232,223,0.5); font-style: italic; }
+
+    /* ══════════════════════════════
+       [7] Soru sayfası logo filigranı
+    ══════════════════════════════ */
+    .q-logo-watermark {
+      margin-top: 36px;
+      opacity: 0.1;
+      pointer-events: none;
+      user-select: none;
+    }
+    .q-logo-watermark img {
+      width: clamp(100px, 28vw, 160px);
+      display: block;
+      margin: 0 auto;
+    }
 
     /* ══════════════════════════════
        RESPONSIVE
@@ -380,9 +429,17 @@
   <!-- 1. LANDING -->
   <section class="screen active" id="screen-landing">
     <div class="landing-eyebrow">İstanbul — Dövme Sanatçısı</div>
-    <img class="landing-logo" src="images/logo.png" alt="Studio C Tattoo Parlor" />
-    <div class="landing-name">CAN LEVİ</div>
-    <p class="landing-tagline">Hoş geldin! Bence her dövme, sana ait bir hikayeyi anlatır. Bu siteyi, senin o eşsiz hikayene bir başlangıç noktası olmak için kurduk. Birkaç soruya vereceğin kısa cevaplarla, yapay zeka senin için, tamamen sana özel tasarım yapacak. Amacım sana birebir aynısını yaptıracağın statik bir görsel vermek değil; hayalindeki o dövme için ilham olacak, kafandaki fikirleri somutlaştıracak bir ilk adım sunmak. Kendi Hikayeni Çizmeye Buradan Başla ✨</p>
+    <!-- [1] Transparan logo: mix-blend-mode kaldırıldı, yeni logo dosyası kullanıldı -->
+    <img class="landing-logo" src="images/logo.png" alt="Can Levi" />
+    <!-- [2] "CAN LEVİ" yazısı kaldırıldı; yeni tırnaklı paragraf bloğu eklendi -->
+    <div class="landing-quote">
+      <p>"Bence her dövme, sana ait bir hikayeyi anlatır.</p>
+      <p>Bu siteyi, senin o eşsiz hikayene bir başlangıç noktası olmak için kurduk.</p>
+      <p>Birkaç soruya vereceğin kısa cevaplarla, yapay zeka senin için, tamamen sana özel tasarım yapacak 😊</p>
+      <p>Amacım sana birebir aynısını yaptıracağın statik bir görsel vermek değil.</p>
+      <p>Hayalindeki o dövme için ilham olacak, kafandaki fikirleri somutlaştıracak bir ilk adım sunmak."</p>
+      <p class="landing-signature"><em>Can Levi</em></p>
+    </div>
     <button class="enter-btn" data-action="start">Başla</button>
   </section>
 
@@ -392,6 +449,10 @@
     <h2 class="q-text" id="question-text"></h2>
     <p class="q-subtitle" id="q-subtitle"></p>
     <div id="options"></div>
+    <!-- [7] Soru sayfası filigran logo -->
+    <div class="q-logo-watermark">
+      <img src="images/logo.png" alt="" aria-hidden="true">
+    </div>
   </section>
 
   <!-- 3. LOADING -->
@@ -493,17 +554,19 @@ const SUPABASE_URL = 'https://uyjusadaakirelhuhgqr.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_MV17SMsY-3P8VlYsc5LBdQ_eWt-YkQT';
 
 /* ══════════════════════════════════════════════
-   DATA — unchanged from original
+   DATA
 ══════════════════════════════════════════════ */
 const questions = [
   {
     key: "soru1",
     multiSelect: true,
     text: "Haydi gel önce tasarımının temasını belirleyelim 🤗",
+    /* [3] Subtitle zaten vardı ama display bug düzeltildi (aşağıda JS'de "block") */
     subtitle: "birden fazla seçenek işaretleyebilirsin ❤️",
     options: [
-      { value: "Doğa",             hint: "Örn: deniz, güneş, kamp..." },
-      { value: "Hayvan",           hint: "Örn: aslan, kedi, kartal..." },
+      /* [4] hint placeholder'lar "buraya istediğin detayı yazabilirsin" olarak değiştirildi */
+      { value: "Doğa",             hint: true },
+      { value: "Hayvan",           hint: true },
       { value: "Mitoloji / Tarih" },
       { value: "Soyut" },
       { value: "Geometrik" },
@@ -615,13 +678,10 @@ function showScreen(name){
   Object.values(screens).forEach(s => s.classList.remove("active"));
   screens[name].classList.add("active");
 
-  // UI chrome
   const isQ = name === "questions";
   stepCounter.style.display = isQ ? "block" : "none";
-  // back only during questions (not first) or form
   backBtn.style.display = (isQ && state.currentQuestion > 0) || name === "form" ? "block" : "none";
 
-  // progress
   const pctMap = {
     landing:0, questions: ((state.currentQuestion+1)/TOTAL_Q)*60,
     loading:72, wheelResult:85,
@@ -640,33 +700,58 @@ function renderQuestion(){
   document.getElementById("q-label").textContent = `${pad(state.currentQuestion+1)} — ${pad(TOTAL_Q)}`;
   document.getElementById("question-text").textContent = q.text;
 
+  /* [3] Bug düzeltildi: "" yerine "block" — CSS'de display:none olan element
+         inline style "" ile override edildiğinde CSS'e düşer ve gizli kalırdı */
   const subtitleEl = document.getElementById("q-subtitle");
   subtitleEl.textContent = q.subtitle || "";
-  subtitleEl.style.display = q.subtitle ? "" : "none";
+  subtitleEl.style.display = q.subtitle ? "block" : "none";
 
   backBtn.style.display = state.currentQuestion > 0 ? "block" : "none";
 
   const optEl = document.getElementById("options");
   optEl.innerHTML = "";
-  optEl.className = "options";
 
   if (q.type === "visual") {
+    /* ── Görsel soru ── */
+    /* [10] Görsel kart başlıkları gizlendi (CSS'de display:none),
+       [8]  Devam et butonu eklendi — seçim sonrası manuel ilerleme */
+    optEl.className = "options";
     const grid = document.createElement("div");
     grid.className = "visual-options";
     grid.style.gridTemplateColumns = "repeat(3,1fr)";
+
+    let selectedValue = null;
+
+    const continueBtn = document.createElement("button");
+    continueBtn.className = "btn primary";
+    continueBtn.style.cssText = "margin-top:20px; display:none;";
+    continueBtn.textContent = "Devam et";
+    continueBtn.type = "button";
+
     q.options.forEach(opt => {
       const card = document.createElement("div");
       card.className = "visual-card";
-      card.innerHTML = `<img src="${opt.img}" alt="${opt.alt}" loading="lazy"><span>${opt.label}</span>`;
+      /* [10] Sadece img, span yok */
+      card.innerHTML = `<img src="${opt.img}" alt="${opt.alt}" loading="lazy">`;
       card.addEventListener("click", () => {
         grid.querySelectorAll(".visual-card").forEach(c => c.classList.remove("selected"));
         card.classList.add("selected");
-        setTimeout(() => selectOption(opt.value), 280);
+        selectedValue = opt.value;
+        continueBtn.style.display = "";
       });
       grid.appendChild(card);
     });
+
     optEl.appendChild(grid);
+
+    continueBtn.addEventListener("click", () => {
+      if (selectedValue !== null) selectOption(selectedValue);
+    });
+    optEl.appendChild(continueBtn);
+
   } else if (q.multiSelect) {
+    /* ── Çoklu seçim (soru1) — zaten Devam et var, değişmedi ── */
+    optEl.className = "options";
     const selected = new Set();
     const extraInputs = {};
 
@@ -678,7 +763,7 @@ function renderQuestion(){
 
     q.options.forEach(opt => {
       const value = typeof opt === "object" ? opt.value : opt;
-      const hint  = typeof opt === "object" ? opt.hint  : null;
+      const hasHint = typeof opt === "object" && opt.hint;
 
       const wrapper = document.createElement("div");
       wrapper.className = "option-wrapper";
@@ -687,13 +772,16 @@ function renderQuestion(){
       btn.className = "option";
       btn.textContent = value;
       btn.type = "button";
+      /* [9] Önceden seçili görünmemesi için blur ile focus'u temizle */
+      btn.addEventListener("focus", e => { if (!selected.has(value)) e.target.blur(); });
       wrapper.appendChild(btn);
 
-      if (hint) {
+      if (hasHint) {
         const inp = document.createElement("input");
         inp.type = "text";
         inp.className = "option-hint-input";
-        inp.placeholder = hint;
+        /* [4] Placeholder metni değiştirildi */
+        inp.placeholder = "buraya istediğin detayı yazabilirsin";
         inp.style.display = "none";
         extraInputs[value] = inp;
         wrapper.appendChild(inp);
@@ -726,13 +814,38 @@ function renderQuestion(){
     optEl.appendChild(continueBtn);
 
   } else {
+    /* ── Tekli seçim sorular (soru2-9, soru4 hariç) ──
+       [6]  Tuğla/grid düzeni
+       [8]  Devam et butonu eklendi
+       [9]  Hiçbir şık önceden seçili gelmez */
+    optEl.className = "options-grid";
+    let selectedValue = null;
+
+    const continueBtn = document.createElement("button");
+    continueBtn.className = "btn primary";
+    continueBtn.style.cssText = "margin-top:8px; display:none;";
+    continueBtn.textContent = "Devam et";
+    continueBtn.type = "button";
+
     q.options.forEach(opt => {
       const btn = document.createElement("button");
       btn.className = "option";
       btn.textContent = opt;
-      btn.addEventListener("click", () => selectOption(opt));
+      btn.type = "button";
+      btn.addEventListener("click", () => {
+        /* [9] Tıklamadan önce tüm seçimleri temizle */
+        optEl.querySelectorAll(".option").forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        selectedValue = opt;
+        continueBtn.style.display = "";
+      });
       optEl.appendChild(btn);
     });
+
+    continueBtn.addEventListener("click", () => {
+      if (selectedValue !== null) selectOption(selectedValue);
+    });
+    optEl.appendChild(continueBtn);
   }
 }
 
@@ -878,7 +991,6 @@ document.querySelector('[data-action="start"]').addEventListener("click",()=>{
   state.currentQuestion=0; state.answers={}; state.quizResult=null;
   renderQuestion(); showScreen("questions");
 });
-
 
 document.getElementById("spin-btn").addEventListener("click", spinWheel);
 
