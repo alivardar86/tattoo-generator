@@ -442,13 +442,6 @@
 <!-- Back button -->
 <button id="back-btn">← geri</button>
 
-<!-- Netlify form detection -->
-<form name="tattoo-request" data-netlify="true" hidden>
-  <input type="text" name="name" />
-  <input type="email" name="email" />
-  <textarea name="note"></textarea>
-  <input type="text" name="prompt" />
-</form>
 
 <main id="app">
 
@@ -536,14 +529,7 @@
   <section class="screen" id="screen-form">
     <h2 class="form-title">ÇİZİMİNE BAŞLADIM BİLE ☺️</h2>
     <p class="form-sub">5-6 dakikaya sende<br>biter bitmez sana göndermek istiyorum,<br>bana mailini bırakır mısın? ❤️</p>
-    <form
-      id="lead-form"
-      name="tattoo-request"
-      method="POST"
-      data-netlify="true"
-      netlify-honeypot="bot-field"
-    >
-      <input type="hidden" name="form-name" value="tattoo-request" />
+    <form id="lead-form">
       <p hidden><label>Don't fill: <input name="bot-field" /></label></p>
       <input type="hidden" name="prompt" id="hidden-prompt" />
       <label>
@@ -573,12 +559,6 @@
 </main>
 
 <script>
-/* ══════════════════════════════════════════════
-   SUPABASE CONFIG
-══════════════════════════════════════════════ */
-const SUPABASE_URL = 'https://uyjusadaakirelhuhgqr.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_MV17SMsY-3P8VlYsc5LBdQ_eWt-YkQT';
-
 /* ══════════════════════════════════════════════
    DATA
 ══════════════════════════════════════════════ */
@@ -1059,26 +1039,44 @@ document.getElementById("lead-form").addEventListener("submit", async (e)=>{
 
   const result = state.source === 'wheel' ? state.wheelResult : state.quizResult;
 
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/submissions`, {
-    method: 'POST',
-    headers: {
-      'Content-Type':  'application/json',
-      'apikey':        SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Prefer':        'return=minimal'
-    },
-    body: JSON.stringify({
-      name:          form.querySelector('[name="name"]').value.trim(),
-      email:         form.querySelector('[name="email"]').value.trim(),
-      note:          form.querySelector('[name="note"]').value.trim() || null,
-      answers:       state.answers,
-      prompt_result: result,
-      source:        state.source
-    })
-  });
+  function showFormError() {
+    btn.disabled = false;
+    btn.textContent = 'Gönder';
+    let errEl = form.querySelector('.submit-error');
+    if (!errEl) {
+      errEl = document.createElement('p');
+      errEl.className = 'submit-error';
+      errEl.style.cssText = 'color:#e57373;font-size:13px;margin-top:8px;text-align:center';
+      btn.insertAdjacentElement('afterend', errEl);
+    }
+    errEl.textContent = 'Bir sorun oluştu, tekrar dener misin?';
+  }
 
-  if (!res.ok) console.error('Supabase error:', res.status, await res.text());
-  showScreen("done");
+  try {
+    const res = await fetch('/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name:          form.querySelector('[name="name"]').value.trim(),
+        email:         form.querySelector('[name="email"]').value.trim(),
+        note:          form.querySelector('[name="note"]').value.trim() || null,
+        answers:       state.answers,
+        prompt_result: result,
+        source:        state.source,
+        'bot-field':   (form.querySelector('[name="bot-field"]') || {}).value || ''
+      })
+    });
+
+    if (res.ok) {
+      showScreen("done");
+    } else {
+      console.error('Submit error:', res.status, await res.text().catch(() => ''));
+      showFormError();
+    }
+  } catch (err) {
+    console.error('Submit error:', err);
+    showFormError();
+  }
 });
 </script>
 </body>

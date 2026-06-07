@@ -1,0 +1,57 @@
+module.exports = async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Future: Cloudflare Turnstile token verification goes here
+  // const { token } = req.body;
+  // const turnstileOk = await verifyTurnstile(token, req.headers['x-forwarded-for']);
+  // if (!turnstileOk) return res.status(403).json({ error: 'Bot check failed' });
+
+  const {
+    name,
+    email,
+    note,
+    answers,
+    prompt_result,
+    source,
+    'bot-field': botField
+  } = req.body || {};
+
+  // Honeypot: bot filled the hidden field — silently succeed without inserting
+  if (botField) {
+    return res.status(200).json({ ok: true });
+  }
+
+  const supabaseUrl     = process.env.SUPABASE_URL;
+  const serviceRoleKey  = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    console.error('[submit] Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY env vars');
+    return res.status(500).json({ error: 'Server configuration error' });
+  }
+
+  try {
+    const response = await fetch(`${supabaseUrl}/rest/v1/submissions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'apikey':        serviceRoleKey,
+        'Authorization': `Bearer ${serviceRoleKey}`,
+        'Prefer':        'return=minimal'
+      },
+      body: JSON.stringify({ name, email, note, answers, prompt_result, source })
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      console.error('[submit] Supabase error:', response.status, text);
+      return res.status(502).json({ error: 'Database write failed' });
+    }
+
+    return res.status(200).json({ ok: true });
+  } catch (err) {
+    console.error('[submit] Unexpected error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
