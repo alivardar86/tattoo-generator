@@ -131,6 +131,7 @@ function showDash() {
 function logout() {
   if (accessToken) sbLogout(accessToken);
   accessToken = null;
+  _submissions = [];
   localStorage.removeItem('sb_access_token');
   showLogin();
 }
@@ -141,18 +142,23 @@ loginForm.addEventListener('submit', async (e) => {
   loginBtn.disabled      = true;
   loginBtn.textContent   = 'Giriş yapılıyor...';
 
-  const data = await sbLogin(
-    document.getElementById('login-email').value.trim(),
-    document.getElementById('login-password').value
-  );
+  try {
+    const data = await sbLogin(
+      document.getElementById('login-email').value.trim(),
+      document.getElementById('login-password').value
+    );
 
-  if (data.access_token) {
-    accessToken = data.access_token;
-    localStorage.setItem('sb_access_token', accessToken);
-    showDash();
-    loadSubmissions();
-  } else {
-    loginError.textContent = 'Email veya şifre hatalı.';
+    if (data.access_token) {
+      accessToken = data.access_token;
+      localStorage.setItem('sb_access_token', accessToken);
+      await loadSubmissions();
+    } else {
+      loginError.textContent = 'Hatalı e-posta veya şifre.';
+      loginBtn.disabled      = false;
+      loginBtn.textContent   = 'Giriş Yap';
+    }
+  } catch {
+    loginError.textContent = 'Bağlantı hatası. Lütfen tekrar deneyin.';
     loginBtn.disabled      = false;
     loginBtn.textContent   = 'Giriş Yap';
   }
@@ -177,10 +183,10 @@ async function loadSubmissions() {
 
   if (!Array.isArray(data)) {
     tbody.innerHTML = `<tr><td colspan="5" class="empty">Veri yüklenemedi.</td></tr>`;
-    console.error('Supabase response:', data);
     return;
   }
 
+  showDash();
   _submissions = data;
   renderStats(data);
   renderTable(data);
@@ -385,8 +391,15 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal
    BAŞLAT
 ══════════════════════════════════════════════ */
 if (accessToken) {
-  showDash();
-  loadSubmissions();
+  loadSubmissions(); // showDash() yalnızca başarılı veri gelince çağrılır
 } else {
   showLogin();
 }
+
+// BFCache: tarayıcı sayfayı önbellekten geri yükleyince token'ı yeniden kontrol et
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) {
+    accessToken = localStorage.getItem('sb_access_token');
+    if (!accessToken) showLogin();
+  }
+});
