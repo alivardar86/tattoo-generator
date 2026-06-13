@@ -1,3 +1,41 @@
+const { Resend } = require('resend');
+
+function buildEmailHtml({ name, email, note, answers, prompt_result, source }) {
+  const rows = [
+    ['İsim', name],
+    ['E-posta', email],
+    ['Not', note],
+    ['Kaynak', source],
+    ['Prompt Sonucu', prompt_result],
+  ];
+
+  let answersHtml = '';
+  if (answers && typeof answers === 'object') {
+    const entries = Array.isArray(answers)
+      ? answers.map((v, i) => [`Soru ${i + 1}`, v])
+      : Object.entries(answers);
+    answersHtml = entries
+      .map(([k, v]) => `<tr><td style="padding:4px 8px;font-weight:bold;white-space:nowrap">${k}</td><td style="padding:4px 8px">${v ?? '—'}</td></tr>`)
+      .join('');
+  }
+
+  const baseRows = rows
+    .map(([k, v]) => `<tr><td style="padding:4px 8px;font-weight:bold;white-space:nowrap">${k}</td><td style="padding:4px 8px">${v ?? '—'}</td></tr>`)
+    .join('');
+
+  return `
+    <html><body style="font-family:sans-serif;color:#222">
+      <h2 style="margin-bottom:16px">Yeni Dövme Talebi</h2>
+      <table style="border-collapse:collapse;width:100%">
+        <tbody>
+          ${baseRows}
+          ${answersHtml}
+        </tbody>
+      </table>
+    </body></html>
+  `;
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -47,6 +85,22 @@ module.exports = async function handler(req, res) {
       const text = await response.text();
       console.error('[submit] Supabase error:', response.status, text);
       return res.status(502).json({ error: 'Database write failed' });
+    }
+
+    // Send notification email — failure does NOT block the successful response
+    try {
+      const resendKey = process.env.RESEND_API_KEY;
+      if (!resendKey) throw new Error('RESEND_API_KEY not set');
+
+      const resend = new Resend(resendKey);
+      await resend.emails.send({
+        from:    'Can Levi Tattoo <bildirim@canlevi.com>',
+        to:      'info@canlevi.com',
+        subject: `Yeni Talep: ${name || 'İsimsiz'}`,
+        html:    buildEmailHtml({ name, email, note, answers, prompt_result, source }),
+      });
+    } catch (mailErr) {
+      console.error('[submit] Resend error (non-fatal):', mailErr);
     }
 
     return res.status(200).json({ ok: true });

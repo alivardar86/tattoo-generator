@@ -124,11 +124,22 @@
     .landing-quote p + p { margin-top: 5px; }
     .landing-signature {
       margin-top: 10px;
-      font-size: 13px;
-      letter-spacing: .12em;
-      font-style: italic;
+      margin-bottom: 12px;
+      font-size: clamp(17px, 2.6vw, 22px);
+      letter-spacing: .18em;
       color: var(--gold);
     }
+    .portfolio-link {
+      display: block; margin-top: 16px;
+      font-family: var(--serif); font-size: 11px;
+      letter-spacing: .25em; text-transform: uppercase;
+      color: var(--cream-dim); text-decoration: none;
+      border: 1px solid var(--cream-faint);
+      padding: 10px 24px; text-align: center;
+      transition: color .3s, border-color .3s;
+      background: none; cursor: pointer;
+    }
+    .portfolio-link:hover { border-color: var(--gold-dim); color: var(--cream); }
 
     .landing-welcome {
       font-size: clamp(17px, 2.6vw, 22px);
@@ -448,19 +459,10 @@
   <!-- 1. LANDING -->
   <section class="screen active" id="screen-landing">
     <div class="landing-eyebrow">İstanbul — Dövme Sanatçısı</div>
-    <!-- [1] Transparan logo: mix-blend-mode kaldırıldı, yeni logo dosyası kullanıldı -->
     <img class="landing-logo" src="images/logo.png" alt="Can Levi" />
-    <p class="landing-welcome">Hoş geldiniz</p>
-    <!-- [2] "CAN LEVİ" yazısı kaldırıldı; yeni tırnaklı paragraf bloğu eklendi -->
-    <div class="landing-quote">
-      <p>"Bence her dövme, sana ait bir hikayeyi anlatır.</p>
-      <p>Bu siteyi, senin o eşsiz hikayene bir başlangıç noktası olmak için kurduk.</p>
-      <p>Birkaç soruya vereceğin kısa cevaplarla, yapay zeka senin için, tamamen sana özel tasarım yapacak 😊</p>
-      <p>Amacım sana birebir aynısını yaptıracağın statik bir görsel vermek değil.</p>
-      <p>Hayalindeki o dövme için ilham olacak, kafandaki fikirleri somutlaştıracak bir ilk adım sunmak."</p>
-      <p class="landing-signature"><em>Can Levi</em></p>
-    </div>
-    <button class="enter-btn" data-action="start">Başla</button>
+    <p class="landing-signature">Can Levi</p>
+    <button class="portfolio-link" data-action="start">DÖVMEMİ ÇİZ</button>
+    <a class="portfolio-link" href="https://www.instagram.com/can_levi/" target="_blank" rel="noopener">Portfolyo</a>
   </section>
 
   <!-- 2. QUESTIONS -->

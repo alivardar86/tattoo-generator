@@ -1,0 +1,24 @@
+{
+  "name": "tattoo-generator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "admin.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alivardar86/tattoo-generator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/alivardar86/tattoo-generator/issues"
+  },
+  "homepage": "https://github.com/alivardar86/tattoo-generator#readme",
+  "dependencies": {
+    "resend": "^6.12.4"
+  }
+}
