@@ -93,12 +93,13 @@ module.exports = async function handler(req, res) {
       if (!resendKey) throw new Error('RESEND_API_KEY not set');
 
       const resend = new Resend(resendKey);
-      await resend.emails.send({
+      const { error: mailApiError } = await resend.emails.send({
         from:    'Can Levi Tattoo <bildirim@canlevi.com>',
         to:      'info@canlevi.com',
         subject: `Yeni Talep: ${name || 'İsimsiz'}`,
         html:    buildEmailHtml({ name, email, note, answers, prompt_result, source }),
       });
+      if (mailApiError) throw new Error(mailApiError.message || JSON.stringify(mailApiError));
     } catch (mailErr) {
       console.error('[submit] Resend error (non-fatal):', mailErr);
     }
