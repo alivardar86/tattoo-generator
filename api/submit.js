@@ -94,7 +94,7 @@ module.exports = async function handler(req, res) {
 
       const resend = new Resend(resendKey);
       const { error: mailApiError } = await resend.emails.send({
-        from:    'Can Levi Tattoo <bildirim@canlevi.com>',
+        from:    'Can Levi Tattoo <info@canlevi.com>',
         to:      'info@canlevi.com',
         subject: `Yeni Talep: ${name || 'İsimsiz'}`,
         html:    buildEmailHtml({ name, email, note, answers, prompt_result, source }),
