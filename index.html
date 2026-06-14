@@ -7,7 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
-  <script defer src="https://cloud.umami.is/script.js" data-website-id="d3156905-42f2-479b-b2f8-e843517193c4"></script>
   <style>
     /* ── Reset ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -661,7 +660,6 @@ const segColors=["#16213e","#2d1b33","#1a2e1a","#3b1a1a","#1b2a2e","#2e2616","#1
    STATE
 ══════════════════════════════════════════════ */
 const state = { currentQuestion:0, answers:{}, quizResult:null, wheelResult:null, source:'quiz' };
-let quizStartedTracked = false;
 
 /* ══════════════════════════════════════════════
    SCREENS
@@ -747,7 +745,6 @@ function renderQuestion(){
         grid.querySelectorAll(".visual-card").forEach(c => c.classList.remove("selected"));
         card.classList.add("selected");
         selectedValue = opt.value;
-        window.umami?.track('style_selected', { style: opt.value });
         continueBtn.style.display = "";
       });
       grid.appendChild(card);
@@ -799,10 +796,6 @@ function renderQuestion(){
       }
 
       btn.addEventListener("click", () => {
-        if (!quizStartedTracked && state.currentQuestion === 0) {
-          quizStartedTracked = true;
-          window.umami?.track('quiz_started');
-        }
         if (selected.has(value)) {
           selected.delete(value);
           btn.classList.remove("selected");
@@ -867,8 +860,6 @@ function renderQuestion(){
 function selectOption(value){
   const q = questions[state.currentQuestion];
   state.answers[q.key] = value;
-  const completedStep = state.currentQuestion + 1;
-  window.umami?.track('quiz_step_completed', { step: completedStep });
   state.currentQuestion++;
 
   if(state.currentQuestion < questions.length){
@@ -876,7 +867,6 @@ function selectOption(value){
     setProgress(((state.currentQuestion+1)/TOTAL_Q)*60);
     stepCounter.textContent = `${pad(state.currentQuestion+1)} — ${pad(TOTAL_Q)}`;
   } else {
-    window.umami?.track('quiz_completed');
     buildResult();
     state.source = 'quiz';
     showScreen("loading");
@@ -1006,12 +996,8 @@ function resultToPrompt(r){
    EVENT LISTENERS
 ══════════════════════════════════════════════ */
 document.querySelector('[data-action="start"]').addEventListener("click",()=>{
-  state.currentQuestion=0; state.answers={}; state.quizResult=null; quizStartedTracked=false;
+  state.currentQuestion=0; state.answers={}; state.quizResult=null;
   renderQuestion(); showScreen("questions");
-});
-
-document.querySelector('a.portfolio-link[href*="instagram"]').addEventListener("click", () => {
-  window.umami?.track('instagram_click');
 });
 
 document.getElementById("spin-btn").addEventListener("click", spinWheel);
@@ -1056,7 +1042,6 @@ document.getElementById("lead-form").addEventListener("submit", async (e)=>{
   const result = state.source === 'wheel' ? state.wheelResult : state.quizResult;
 
   function showFormError() {
-    window.umami?.track('form_error');
     btn.disabled = false;
     btn.textContent = 'Gönder';
     let errEl = form.querySelector('.submit-error');
@@ -1085,7 +1070,6 @@ document.getElementById("lead-form").addEventListener("submit", async (e)=>{
     });
 
     if (res.ok) {
-      window.umami?.track('form_submitted');
       showScreen("done");
     } else {
       console.error('Submit error:', res.status, await res.text().catch(() => ''));
